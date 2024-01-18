@@ -45,41 +45,41 @@ tsdata = TS[,c("time","gnp","pwage","cprofits",'consumption',
                "gwage","invest","capital")]
 fit = dsem( sem=sem,
             tsdata = tsdata,
-            newtonsteps = 0,
             estimate_delta0 = TRUE,
-            control = dsem_control(quiet = TRUE) )
+            control = dsem_control(
+              quiet = TRUE,
+              newton_loops = 0) )
 
 # Compile
 m1 = rbind( summary(fm_cons)$coef[-1,],
             summary(fm_inv)$coef[-1,],
             summary(fm_pwage)$coef[-1,] )[,1:2]
-m2 = summary(fit$opt$SD)[1:9,]
+m2 = summary(fit$sdrep)[1:9,]
 m = rbind(
   data.frame("var"=rownames(m1),m1,"method"="OLS","eq"=rep(c("C","I","Wp"),each=3)),
   data.frame("var"=rownames(m1),m2,"method"="GMRF","eq"=rep(c("C","I","Wp"),each=3))
 )
 m = cbind(m, "lower"=m$Estimate-m$Std..Error, "upper"=m$Estimate+m$Std..Error )
 
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, fig.cap="Econometric variables fitted to demonstrate dynamic structural equation modelling"----
 # ggplot estimates
-
 longform = melt( as.data.frame(KleinI) )
   longform$year = rep( time(KleinI), 9 )
-p1 = ggplot( data=longform, aes(x=year, y=value) ) +
+ggplot( data=longform, aes(x=year, y=value) ) +
   facet_grid( rows=vars(variable), scales="free" ) +
   geom_line( )
 
-p2 = ggplot(data=m, aes(x=interaction(var,eq), y=Estimate, color=method)) +
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, fig.cap="Comparison of package dsem and package dynlm when fitting a dynamic structural equation model to econometric data"----
+ggplot(data=m, aes(x=interaction(var,eq), y=Estimate, color=method)) +
   geom_point( position=position_dodge(0.9) ) +
   geom_errorbar( aes(ymax=as.numeric(upper),ymin=as.numeric(lower)),
                  width=0.25, position=position_dodge(0.9))  #
 
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7, fig.cap="Estimated structural model among econometric variables"----
 p3 = plot( as_fitted_DAG(fit) ) +
      expand_limits(x = c(-0.2,1) )
 p4 = plot( as_fitted_DAG(fit, lag=1), text_size=4 ) +
      expand_limits(x = c(-0.2,1), y = c(-0.2,0) )
-
-p1
-p2
 grid.arrange( arrangeGrob(p3, p4, nrow=2) )
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, eval=FALSE----------
@@ -95,11 +95,11 @@ grid.arrange( arrangeGrob(p3, p4, nrow=2) )
 ## ----echo=FALSE, message=FALSE, fig.width=6, fig.height=4, out.width = "100%", eval=TRUE----
 summary_mcmc = readRDS( file.path(system.file("tmbstan",package="dsem"),"summary_mcmc.RDS") )
 
-## ----echo=TRUE, message=FALSE, fig.width=6, fig.height=4, out.width = "100%", eval=TRUE----
+## ----echo=TRUE, message=FALSE, fig.width=6, fig.height=4, out.width = "100%", eval=TRUE, fig.cap="Comparison of Laplace approximation and Markov chain Monte Carlo estimates when fitting an econometric example using dynamic structural equation models"----
 # long-form data frame
 m1 = summary_mcmc$summary[1:17,c('mean','sd')]
 rownames(m1) = paste0( "b", seq_len(nrow(m1)) )
-m2 = summary(fit$opt$SD)[1:17,c('Estimate','Std. Error')]
+m2 = summary(fit$sdrep)[1:17,c('Estimate','Std. Error')]
 m = rbind(
   data.frame('mean'=m1[,1], 'sd'=m1[,2], 'par'=rownames(m1), "method"="MCMC"),
   data.frame('mean'=m2[,1], 'sd'=m2[,2], 'par'=rownames(m1), "method"="LA")
@@ -113,7 +113,7 @@ ggplot(data=m, aes(x=par, y=mean, col=method)) +
   geom_errorbar( aes(ymax=as.numeric(upper),ymin=as.numeric(lower)),
                  width=0.25, position=position_dodge(0.9))  #
 
-## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5----------------------
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, fig.cap="Time-series observations (top panel) and a comparison of estimated structural linkages (bottom panel) among alternative software for fitting a cross-lagged model for wolves and moose in Isle Royale"----
 data(isle_royale)
 data = ts( log(isle_royale[,2:3]), start=1959)
 
@@ -128,8 +128,9 @@ sem = "
 fit0 = dsem( sem = sem,
              tsdata = data,
              estimate_delta0 = FALSE,
-             control = dsem_control(quiet=TRUE),
-             getsd=FALSE )
+             control = dsem_control(
+               quiet = TRUE,
+               getsd = FALSE) )
 # Refit with delta0
 fit = dsem( sem = sem,
             tsdata = data,
@@ -160,8 +161,8 @@ var = VAR( data, type="const" )
 
 ### Compile
 m1 = rbind( summary(fm_wolf)$coef[-1,], summary(fm_moose)$coef[-1,] )[,1:2]
-m2 = summary(fit$opt$SD)[1:4,]
-#m2 = cbind( "Estimate"=fit$opt$par, "Std. Error"=fit$opt$SD$par.fixed )[1:4,]
+m2 = summary(fit$sdrep)[1:4,]
+#m2 = cbind( "Estimate"=fit$opt$par, "Std. Error"=fit$sdrep$par.fixed )[1:4,]
 m3 = cbind( SE$parMean[c(1,3,2,4)], SE$par.se$B[c(1,3,2,4)] )
 colnames(m3) = colnames(m2)
 m4 = rbind( summary(var$varresult$wolves)$coef[-3,], summary(var$varresult$moose)$coef[-3,] )[,1:2]
@@ -191,15 +192,16 @@ p2 = ggplot(data=m, aes(x=interaction(var,eq), y=Estimate, color=method)) +
   geom_point( position=position_dodge(0.9) ) +
   geom_errorbar( aes(ymax=as.numeric(upper),ymin=as.numeric(lower)),
                  width=0.25, position=position_dodge(0.9))  #
-p3 = plot( as_fitted_DAG(fit, lag=1), rotation=0 ) +
+ggarrange( p1, p2,
+           labels = c("Time-series data", "Estimated effects"),
+           ncol = 1, nrow = 2)
+
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, fig.cap="Estimated structural model representing cross-lagged interactions between wolves and moose in Isle Royale"----
+plot( as_fitted_DAG(fit, lag=1), rotation=0 ) +
      geom_edge_loop( aes( label=round(weight,2), direction=0)) + #arrow=arrow(), , angle_calc="along", label_dodge=grid::unit(10,"points") )
      expand_limits(x = c(-0.1,0) )
 
-ggarrange( p1, p2, p3,
-           labels = c("Time-series data", "Estimated effects", "Fitted path digram"),
-           ncol = 1, nrow = 3)
-
-## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5----------------------
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, fig.cap="Time-series observations (dots) and estimates (blue lines and shading) for variables affecting recruitment for Alaska pollock in the eastern Bering Sea"----
 data(bering_sea)
 Z = ts( bering_sea )
 family = rep('fixed', ncol(bering_sea))
@@ -236,12 +238,12 @@ ParHat = fit$obj$env$parList()
 # summary( fit )
 
 # Timeseries plot
-oldpar <- par()
+oldpar <- par(no.readonly = TRUE)
 par( mfcol=c(3,3), mar=c(2,2,2,0), mgp=c(2,0.5,0), tck=-0.02 )
 for(i in 1:ncol(bering_sea)){
   tmp = bering_sea[,i,drop=FALSE]
   tmp = cbind( tmp, "PSEM"=ParHat$x_tj[,i] )
-  SD = as.list(fit$opt$SD,what="Std.")$x_tj[,i]
+  SD = as.list(fit$sdrep,what="Std.")$x_tj[,i]
   tmp = cbind( tmp, outer(tmp[,2],c(1,1)) +
                outer(ifelse(is.na(SD),0,SD),c(-1,1)) )
   #
@@ -254,6 +256,7 @@ for(i in 1:ncol(bering_sea)){
 }
 par(oldpar)
 
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7, fig.cap="Structural model representing ecosystem linkages affecting recruitment for Alaska pollock in the eastern Bering Sea"----
 #
 library(phylopath)
 library(ggplot2)
@@ -277,13 +280,10 @@ p2 = plot( (as_fitted_DAG(fit, what="p_value")), edge.width=1, type="width",
      scale_x_continuous(expand = c(0.4, 0.1))
 p2$layers[[1]]$mapping$edge_width = 0.5
 
-#grid.arrange( arrangeGrob( p0+ggtitle("timeseries"),
-#              arrangeGrob( p1+ggtitle("Estimated path diagram"),
-#                           p2+ggtitle("Estimated p-values"), nrow=2), ncol=2 ) )
 ggarrange(p1, p2, labels = c("Simultaneous effects", "Two-sided p-value"),
                     ncol = 1, nrow = 2)
 
-## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5----------------------
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7, fig.cap="Structural model representing a trophic cascade"----
 data(sea_otter)
 Z = ts( sea_otter[,-1] )
 
