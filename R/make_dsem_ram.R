@@ -5,6 +5,7 @@
 #' @inheritParams dsem
 #' @param times A character vector listing the set of times in order
 #' @param variables A character vector listing the set of variables
+#' @param covs A character vector listing variables for which to estimate a standard deviation
 #' @param quiet Boolean indicating whether to print messages to terminal
 #' @param remove_na Boolean indicating whether to remove NA values from RAM (default) or not.
 #'            \code{remove_NA=FALSE} might be useful for exploration and diagnostics for
@@ -193,27 +194,28 @@ make_dsem_ram <-
 function( sem,
           times,
           variables,
+          covs = NULL,
           quiet = FALSE,
           remove_na = TRUE ){
   # Docs : https://roxygen2.r-lib.org/articles/formatting.html
 
   # MATH CHECK IN ROXYGEN DOCS ABOVE
   if( FALSE ){
-    rho = 0.8
-    sigma = 0.5
-    Rho = Gamma = matrix(0, nrow=4, ncol=4)
-    Rho[cbind(2:4,1:3)] = rho
-    Gamma = I = diag(4)
-    diag(Gamma)[] = sigma
-    # DSEM covariance
-    solve(I-Rho) %*% Gamma %*% t(Gamma) %*% t(solve(I-Rho))
-    # Stated covariance
-    sigma^2 * rbind(
-      c(1, rho, rho^2, rho^3),
-      c(rho, 1+rho^2, rho*(1+rho^2), rho^2*(1+rho^2) ),
-      c(rho^2, rho*(1+rho^2), 1+rho^2+rho^4, rho*(1+rho^2+rho^4) ),
-      c(rho^3, rho^2*(1+rho^2), rho*(1+rho^2+rho^4), 1+rho^2+rho^4+rho^6 )
-    )
+    #rho = 0.8
+    #sigma = 0.5
+    #Rho = Gamma = matrix(0, nrow=4, ncol=4)
+    #Rho[cbind(2:4,1:3)] = rho
+    #Gamma = I = diag(4)
+    #diag(Gamma)[] = sigma
+    ## DSEM covariance
+    #solve(I-Rho) %*% Gamma %*% t(Gamma) %*% t(solve(I-Rho))
+    ## Stated covariance
+    #sigma^2 * rbind(
+    #  c(1, rho, rho^2, rho^3),
+    #  c(rho, 1+rho^2, rho*(1+rho^2), rho^2*(1+rho^2) ),
+    #  c(rho^2, rho*(1+rho^2), 1+rho^2+rho^4, rho*(1+rho^2+rho^4) ),
+    #  c(rho^3, rho^2*(1+rho^2), rho*(1+rho^2+rho^4), 1+rho^2+rho^4+rho^6 )
+    #)
   }
 
   ####### Error checks
@@ -284,24 +286,25 @@ function( sem,
   model$par[model$par == ""] <- NA
   model <- cbind( "path"=model$path, "lag"=model$lag, "name"=model$par, "start"=model$start)
 
-  #if( !is.null(covs) ){
-  #  for (cov in covs) {
-  #    vars <- strsplit(cov, "[ ,]+")[[1]]
-  #    nvar <- length(vars)
-  #    for (i in 1:nvar) {
-  #    for (j in i:nvar) {
-  #      p1 = paste(vars[i], "<->", vars[j])
-  #      p2 = if (i==j) paste("V[", vars[i], "]", sep = "") else paste("C[",vars[i], ",", vars[j], "]", sep = "")
-  #      p3 = NA
-  #      row <- c(p1, 0, p2, p3)
-  #      if( any((row[1]==model[,1]) & (row[2]==model[,2])) ){
-  #        next
-  #      }else{
-  #        model <- rbind(model, row, deparse.level = 0)
-  #      }
-  #    }}
-  #  }
-  #}
+  # Adding a SD automatically
+  if( !is.null(covs) ){
+    for (cov in covs) {
+      vars <- strsplit(cov, "[ ,]+")[[1]]
+      nvar <- length(vars)
+      for (i in 1:nvar) {
+      for (j in i:nvar) {
+        p1 = paste(vars[i], "<->", vars[j])
+        p2 = if (i==j) paste("V[", vars[i], "]", sep = "") else paste("C[",vars[i], ",", vars[j], "]", sep = "")
+        p3 = NA
+        row <- c(p1, 0, p2, p3)
+        if( any((row[1]==model[,1]) & (row[2]==model[,2])) ){
+          next
+        }else{
+          model <- rbind(model, row, deparse.level = 0)
+        }
+      }}
+    }
+  }
 
   exog.variances = endog.variances = TRUE
   model = add.variances()

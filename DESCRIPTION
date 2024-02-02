@@ -1,15 +1,15 @@
 Package: dsem
 Type: Package
 Title: Fit Dynamic Structural Equation Models
-Version: 1.0.1
-Date: 2024-01-17
+Version: 1.0.2
+Date: 2024-02-01
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
              role = c("aut", "cre"),
              email = "James.Thorson@noaa.gov")
     )
-Imports: TMB (>= 1.9.7), Matrix (>= 1.6.3), sem, igraph, methods
+Imports: TMB, Matrix, sem, igraph, methods
 Depends: R (>= 4.0.0),
 Suggests: knitr, AER, phylopath, rmarkdown, reshape, gridExtra, dynlm,
         MARSS, ggplot2, ggpubr, ggraph, grid, vars, testthat
@@ -26,9 +26,10 @@ RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 LazyData: true
 URL: https://james-thorson-noaa.github.io/dsem/
+BugReports: https://github.com/James-Thorson-NOAA/dsem/issues
 NeedsCompilation: yes
-Packaged: 2024-01-18 04:41:46 UTC; James.Thorson
+Packaged: 2024-02-02 01:49:34 UTC; James.Thorson
 Author: James Thorson [aut, cre]
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2024-01-18 05:00:03 UTC
+Date/Publication: 2024-02-02 05:00:02 UTC
