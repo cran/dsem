@@ -1,6 +1,6 @@
-c7530c73f3690c73d9db4105d29ab5c1 *DESCRIPTION
+08e387c4fe134456e0aad0440129b90b *DESCRIPTION
 30d45a6e31cc2039dc6ed18b0223e516 *NAMESPACE
-d8a9de6b9475a7369e8866f45cee896c *NEWS.md
+de14691c8e8f5541cbd566330d62d710 *NEWS.md
 e005627ab38fe0f070c77aca43b449f8 *R/TMBAIC.R
 527c383d797e9e33039ce9a33a0312ad *R/classify_variables.R
 b4d43b25bc00f77b002f5390604a1548 *R/data.R
@@ -11,14 +11,14 @@ afbfe74759c73af74a862896544f90ec *R/parse_path.R
 6ba690fb226680b576515abc4ae532ee *R/utils.R
 a865d0d28de103af6b5873d348cb5be4 *R/zzz.R
 647469c8526cf05810a75f4e9565be8d *README.md
-ea7fdc98651008929c80e76a1bec7d1d *build/vignette.rds
+cdc29abd5a875aba6c09a6e6522e3b50 *build/vignette.rds
 08561f68420ab8365468c50a01be3a32 *data/bering_sea.rda
 0caa2d6d86ce1be1e2c9bd776ee0c620 *data/isle_royale.rda
 aaf1dec5069bae500ad583f3a6b4eadc *data/sea_otter.rda
-981b3d0bf139f415918cb7e556ea2841 *inst/CITATION
+de6ac39c874ed254067d7e372dbbb10a *inst/CITATION
 06d265e9b3fe5651015aa33accc1b61d *inst/doc/vignette.R
 e1475b272bb549c9c99ef6de6a724241 *inst/doc/vignette.Rmd
-911e85395c2977c2a5928899dda61ee9 *inst/doc/vignette.pdf
+d70ef199366121980995dc41f58bf86e *inst/doc/vignette.html
 b553ba286b80a2eb641aa03896d8400b *inst/tmbstan/summary_mcmc.RDS
 2649287bc794e5a0b85e1c00e2e24aa0 *man/TMBAIC.Rd
 92508c623143d3723024094c68ab550e *man/as_fitted_DAG.Rd
@@ -43,8 +43,7 @@ e72af94e8ed32ba36eac529108c5262a *man/sea_otter.Rd
 af5528c144e9095bb56b4075afca7d25 *man/summary.dsem.Rd
 0ba3e7ac6b0dad54737717e381c83b45 *man/vcov.dsem.Rd
 b6da1018e8cc8791d459652629857d00 *src/Makevars
-d4dff99df8239c8ab6cf4a39db3d0e98 *src/dsem.cpp
+20aa8666f020e2418759964a3e2602b1 *src/dsem.cpp
 5a2d8923fdbff951e52c7212fd23471f *tests/testthat.R
 9a332d02880457df95e2ff12afdc3e91 *tests/testthat/test-platform.R
 e1475b272bb549c9c99ef6de6a724241 *vignettes/vignette.Rmd
-de9b7bfabe257cf4bbd644d80b32470b *vignettes/vignette.html
