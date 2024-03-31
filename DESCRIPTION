@@ -1,8 +1,8 @@
 Package: dsem
 Type: Package
 Title: Fit Dynamic Structural Equation Models
-Version: 1.1.0
-Date: 2024-02-16
+Version: 1.2.0
+Date: 2024-03-29
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -22,14 +22,14 @@ Description: Applies dynamic structural equation models to time-series data
 	constrained by ecological mechanisms."  
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 LazyData: true
 URL: https://james-thorson-noaa.github.io/dsem/
 BugReports: https://github.com/James-Thorson-NOAA/dsem/issues
 NeedsCompilation: yes
-Packaged: 2024-02-17 00:57:25 UTC; James.Thorson
+Packaged: 2024-03-30 15:28:09 UTC; James.Thorson
 Author: James Thorson [aut, cre]
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2024-02-17 03:10:02 UTC
+Date/Publication: 2024-03-31 09:40:02 UTC

@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 # Build
 #  setwd(R'(C:\Users\James.Thorson\Desktop\Git\dsem)'); devtools::build_rmd("vignettes/vignette.Rmd"); rmarkdown::render( "vignettes/vignette.Rmd", rmarkdown::pdf_document())
 
-## ----setup, echo=TRUE, message=FALSE------------------------------------------
+## ----setup, echo=TRUE, message=FALSE, warning=FALSE---------------------------
 library(dsem)
 library(dynlm)
 library(ggplot2)
@@ -114,7 +114,7 @@ ggplot(data=m, aes(x=par, y=mean, col=method)) +
   geom_errorbar( aes(ymax=as.numeric(upper),ymin=as.numeric(lower)),
                  width=0.25, position=position_dodge(0.9))  #
 
-## ----echo=TRUE, message=FALSE, fig.width=5, fig.height=7----------------------
+## ----echo=TRUE, message=FALSE, fig.width=5, fig.height=7, warning=FALSE-------
 data(isle_royale)
 data = ts( log(isle_royale[,2:3]), start=1959)
 
@@ -130,14 +130,19 @@ fit0 = dsem( sem = sem,
              tsdata = data,
              estimate_delta0 = FALSE,
              control = dsem_control(
-               quiet = TRUE,
+               quiet = FALSE,
                getsd = FALSE) )
+
+#
+parameters = fit0$obj$env$parList()
+  parameters$delta0_j = rep( 0, ncol(data) )
+
 # Refit with delta0
 fit = dsem( sem = sem,
             tsdata = data,
             estimate_delta0 = TRUE,
             control = dsem_control( quiet=TRUE,
-                                    parameters = fit0$obj$env$parList()) )
+                                    parameters = parameters ) )
 
 # dynlm
 fm_wolf = dynlm( wolves ~ 1 + L(wolves) + L(moose), data=data )   #
@@ -216,14 +221,13 @@ sem = "
   log_PercentCop -> log_RperS, 0, Scop_to_RperS
   log_Esummer -> log_PercentEuph, 0, Esummer_to_Suph
   log_Cfall -> log_PercentCop, 0, Cfall_to_Scop
-  log_SSB -> log_RperS, 0, SSB_to_RperS
+  SSB -> log_RperS, 0, SSB_to_RperS
 
   log_seaice -> log_seaice, 1, AR1, 0.001
   log_CP -> log_CP, 1,  AR2, 0.001
-  log_Cspring -> log_Cspring, 1, AR3, 0.001
   log_Cfall -> log_Cfall, 1, AR4, 0.001
   log_Esummer -> log_Esummer, 1, AR5, 0.001
-  log_SSB -> log_SSB, 1, AR6, 0.001
+  SSB -> SSB, 1, AR6, 0.001
   log_RperS ->  log_RperS, 1, AR7, 0.001
   log_PercentEuph -> log_PercentEuph, 1, AR8, 0.001
   log_PercentCop -> log_PercentCop, 1, AR9, 0.001
@@ -243,10 +247,10 @@ oldpar <- par(no.readonly = TRUE)
 par( mfcol=c(3,3), mar=c(2,2,2,0), mgp=c(2,0.5,0), tck=-0.02 )
 for(i in 1:ncol(bering_sea)){
   tmp = bering_sea[,i,drop=FALSE]
-  tmp = cbind( tmp, "PSEM"=ParHat$x_tj[,i] )
+  tmp = cbind( tmp, "pred"=ParHat$x_tj[,i] )
   SD = as.list(fit$sdrep,what="Std.")$x_tj[,i]
-  tmp = cbind( tmp, outer(tmp[,2],c(1,1)) +
-               outer(ifelse(is.na(SD),0,SD),c(-1,1)) )
+  tmp = cbind( tmp, "lower"=tmp[,2] - ifelse(is.na(SD),0,SD),
+                    "upper"=tmp[,2] + ifelse(is.na(SD),0,SD) )
   #
   plot( x=rownames(bering_sea), y=tmp[,1], ylim=range(tmp,na.rm=TRUE),
         type="p", main=colnames(bering_sea)[i], pch=20, cex=2 )
@@ -287,7 +291,7 @@ p2$layers[[1]]$mapping$edge_width = 0.5
 ggarrange(p1, p2, labels = c("Simultaneous effects", "Two-sided p-value"),
                     ncol = 1, nrow = 2)
 
-## ----echo=TRUE, message=FALSE, fig.width=5, fig.height=7----------------------
+## ----echo=TRUE, message=FALSE, fig.width=5, fig.height=7, warning=FALSE-------
 data(sea_otter)
 Z = ts( sea_otter[,-1] )
 
