@@ -1,6 +1,6 @@
-03d1e03454c9f43d964eb88da8dfd6ce *DESCRIPTION
-3e4c40b72a35bf3d38dc05d90cf4e5e6 *NAMESPACE
-d1c24ad78d31db721e794e9f4851cd59 *NEWS.md
+3a8b4127ce030667e621cf66decbc405 *DESCRIPTION
+861dd5bdb64a78409963ca041966d46b *NAMESPACE
+deebe19ba4ac40d7a661975e08db618d *NEWS.md
 e005627ab38fe0f070c77aca43b449f8 *R/TMBAIC.R
 527c383d797e9e33039ce9a33a0312ad *R/classify_variables.R
 b4d43b25bc00f77b002f5390604a1548 *R/data.R
@@ -9,17 +9,16 @@ c2248a0b46ca8b50c325cf6f5b5eaa6f *R/list_parameters.R
 41d86f2154f288d280929c6d218d1c13 *R/make_dfa.R
 6a860ff4f49e0236688585a677618374 *R/make_dsem_ram.R
 afbfe74759c73af74a862896544f90ec *R/parse_path.R
-6ba690fb226680b576515abc4ae532ee *R/utils.R
-a865d0d28de103af6b5873d348cb5be4 *R/zzz.R
-647469c8526cf05810a75f4e9565be8d *README.md
+f76cd9374faff79d2dcf1aff76b19853 *R/zzz.R
+9623f522608a29f8c76362d048359b96 *README.md
 99a6127f4d6bc262c7012ea8eff276af *build/vignette.rds
 d592e92f13eb20c1f91b9943bc4a9915 *data/bering_sea.rda
 0caa2d6d86ce1be1e2c9bd776ee0c620 *data/isle_royale.rda
 aaf1dec5069bae500ad583f3a6b4eadc *data/sea_otter.rda
 de6ac39c874ed254067d7e372dbbb10a *inst/CITATION
 89f25da7464e92dcc35652e4cd1c4c03 *inst/doc/dynamic_factor_analysis.R
-48391dc831e55f24058c7f400998686d *inst/doc/dynamic_factor_analysis.Rmd
-8b7838804e464ad401e5e1658c51d50e *inst/doc/dynamic_factor_analysis.html
+3d61a5f4cb76689e2c902f798bdac5c5 *inst/doc/dynamic_factor_analysis.Rmd
+ede0b1b24c8e1b7070d1258682268d11 *inst/doc/dynamic_factor_analysis.html
 b219fbb97fe0c43c0ff364ddefea4b53 *inst/doc/vignette.R
 5cd386caeb311549fd6609c6756e048a *inst/doc/vignette.Rmd
 ee6af34263f45bcfd6202d76b4bf390d *inst/doc/vignette.html
@@ -28,7 +27,6 @@ ee6af34263f45bcfd6202d76b4bf390d *inst/doc/vignette.html
 92508c623143d3723024094c68ab550e *man/as_fitted_DAG.Rd
 21c37294f98fff311906bc21ddb8a8d5 *man/as_sem.Rd
 a776c8e816546bf49e645d78050e0108 *man/bering_sea.Rd
-39b3f09c7a4a214cfc65e7891d2002a9 *man/checkDepPackageVersion.Rd
 b94eb546ec09f6be29db48329106eb51 *man/classify_variables.Rd
 970467aa6271037511f42445dc9a8485 *man/dsem.Rd
 5fa00e5080f30485d5b407176f185087 *man/dsem_control.Rd
@@ -41,7 +39,6 @@ a443b8410ff4457e39fb4f71e7d60337 *man/make_dsem_ram.Rd
 9e8f5a6663d963d8afa9c47f80d9a9b7 *man/plot.dsem.Rd
 e9e5f608e5aa1f95838513cbbbc5b9f5 *man/predict.dsem.Rd
 efc8e8517c76b5827b735da18c1f6754 *man/print.dsem.Rd
-1a0b979fa986340e075d4ebca1a0d2a0 *man/reinstalling.Rd
 3ecd5fb0f92831f549d0490e31b47f6a *man/residuals.dsem.Rd
 e72af94e8ed32ba36eac529108c5262a *man/sea_otter.Rd
 5b7c1dde7b366b0a1b1ea57e9642b744 *man/simulate.dsem.Rd
@@ -52,5 +49,5 @@ b6da1018e8cc8791d459652629857d00 *src/Makevars
 5a2d8923fdbff951e52c7212fd23471f *tests/testthat.R
 ec69f85e6b7276cdb8b3619065b542e2 *tests/testthat/test-gmrf-versions.R
 ef5b8d3c7809923ca6230c6b630d5e00 *tests/testthat/test-platform.R
-48391dc831e55f24058c7f400998686d *vignettes/dynamic_factor_analysis.Rmd
+3d61a5f4cb76689e2c902f798bdac5c5 *vignettes/dynamic_factor_analysis.Rmd
 5cd386caeb311549fd6609c6756e048a *vignettes/vignette.Rmd

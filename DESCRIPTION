@@ -1,8 +1,8 @@
 Package: dsem
 Type: Package
 Title: Fit Dynamic Structural Equation Models
-Version: 1.2.0
-Date: 2024-03-29
+Version: 1.2.1
+Date: 2024-04-02
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -28,8 +28,8 @@ LazyData: true
 URL: https://james-thorson-noaa.github.io/dsem/
 BugReports: https://github.com/James-Thorson-NOAA/dsem/issues
 NeedsCompilation: yes
-Packaged: 2024-03-30 15:28:09 UTC; James.Thorson
+Packaged: 2024-04-02 17:18:12 UTC; James.Thorson
 Author: James Thorson [aut, cre]
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2024-03-31 09:40:02 UTC
+Date/Publication: 2024-04-02 23:05:04 UTC

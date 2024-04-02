@@ -468,11 +468,10 @@ using a full-rank covariance so far.</p>
 </div>
 <div id="reduced-rank-factor-model-with-measurement-errors" class="section level2">
 <h2>Reduced-rank factor model with measurement errors</h2>
-<p>Next, we can specify three factors factors while eliminating
-additional process error and estimating measurement errors. This
-requires us to switch to
-<code>gmrf_parameterization = &quot;projection&quot;</code>, so that we can fit a
-rank-deficient Gaussian Markov random field:</p>
+<p>Next, we can specify two factors factors while eliminating additional
+process error and estimating measurement errors. This requires us to
+switch to <code>gmrf_parameterization = &quot;projection&quot;</code>, so that we
+can fit a rank-deficient Gaussian Markov random field:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Add factors to data</span></span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>tsdata <span class="ot">=</span> harborSealWA[,<span class="fu">c</span>(<span class="st">&quot;SJI&quot;</span>,<span class="st">&quot;EBays&quot;</span>,<span class="st">&quot;SJF&quot;</span>,<span class="st">&quot;PSnd&quot;</span>,<span class="st">&quot;HC&quot;</span>)]</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>newcols <span class="ot">=</span> <span class="fu">array</span>( <span class="cn">NA</span>,</span>
