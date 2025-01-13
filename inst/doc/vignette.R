@@ -3,6 +3,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+set.seed(101)
 # Install locally
 #  devtools::install_local( R'(C:\Users\James.Thorson\Desktop\Git\dsem)', force=TRUE )
 # Build
@@ -17,15 +18,55 @@ library(gridExtra)
 library(phylopath)
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
+# simulate normal distribution
+x = rnorm(100)
+y = 1 + 0.5 * x + rnorm(100)
+data = data.frame(x=x, y=y)
+
+# Fit as linear model
+Lm = lm( y ~ x, data=data )
+
+# Fit as DSEM
+fit = dsem( sem = "x -> y, 0, beta",
+            tsdata = ts(data),
+            control = dsem_control(quiet=TRUE) )
+
+# Display output
+m1 = rbind(
+  "lm" = summary(Lm)$coef[2,1:2],
+  "dsem" = summary(fit)[1,9:10]
+)
+knitr::kable( m1, digits=3)
+
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
+# sample-based quantile residuals
+samples = loo_residuals(fit, what="samples", track_progress=FALSE)
+which_use = which(!is.na(data))
+fitResp = loo_residuals( fit, what="loo", track_progress=FALSE)[,'est']
+simResp = apply(samples, MARGIN=3, FUN=as.vector)[which_use,]
+
+# Build and display DHARMa object
+res = DHARMa::createDHARMa(
+        simulatedResponse = simResp,
+        observedResponse = unlist(data)[which_use],
+        fittedPredictedResponse = fitResp )
+plot(res)
+
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
+# Get DSEM Loo residuals and LM working residuals
+res = loo_residuals(fit, what="quantiles", track_progress=FALSE)
+res0 = resid(Lm,"working")
+
+# Plot comparison
+plot( x=res0, y=qnorm(res[,2]),
+      xlab="linear model residuals", ylab="dsem residuals" )
+abline(a=0,b=1)
+
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 data(KleinI, package="AER")
 TS = ts(data.frame(KleinI, "time"=time(KleinI) - 1931))
 
-# dynlm
-fm_cons <- dynlm(consumption ~ cprofits + L(cprofits) + I(pwage + gwage), data = TS)
-fm_inv <- dynlm(invest ~ cprofits + L(cprofits) + capital, data = TS)                 #
-fm_pwage <- dynlm(pwage ~ gnp + L(gnp) + time, data = TS)
-
-# dsem
+# Specify by declaring each arrow and lag
 sem = "
   # Link, lag, param_name
   cprofits -> consumption, 0, a1
@@ -50,7 +91,30 @@ fit = dsem( sem=sem,
               quiet = TRUE,
               newton_loops = 0) )
 
-# Compile
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
+# Specify using equations
+equations = "
+  consumption = a1*cprofits + a2*lag[cprofits,1]+ a3*pwage + a3*gwage
+  invest = b1*cprofits + b2*lag[cprofits,1] + b3*capital
+  pwage = c1*time + c2*gnp + c3*lag[gnp,1]
+"
+
+# Convert and run
+sem_equations = convert_equations(equations)
+fit = dsem( sem = sem_equations,
+            tsdata = tsdata,
+            estimate_delta0 = TRUE,
+            control = dsem_control(
+              quiet = TRUE,
+              newton_loops = 0) )
+
+## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
+# dynlm
+fm_cons <- dynlm(consumption ~ cprofits + L(cprofits) + I(pwage + gwage), data = TS)
+fm_inv <- dynlm(invest ~ cprofits + L(cprofits) + capital, data = TS)
+fm_pwage <- dynlm(pwage ~ gnp + L(gnp) + time, data = TS)
+
+# Compile results
 m1 = rbind( summary(fm_cons)$coef[-1,],
             summary(fm_inv)$coef[-1,],
             summary(fm_pwage)$coef[-1,] )[,1:2]
@@ -61,8 +125,7 @@ m = rbind(
 )
 m = cbind(m, "lower"=m$Estimate-m$Std..Error, "upper"=m$Estimate+m$Std..Error )
 
-# ggplot estimates
-
+# ggplot display of estimates
 longform = melt( as.data.frame(KleinI) )
   longform$year = rep( time(KleinI), 9 )
 p1 = ggplot( data=longform, aes(x=year, y=value) ) +
@@ -84,14 +147,14 @@ p2
 grid.arrange( arrangeGrob(p3, p4, nrow=2) )
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=5, eval=FALSE----------
-#  library(tmbstan)
-#  
-#  # MCMC for both fixed and random effects
-#  mcmc = tmbstan( fit$obj, init="last.par.best" )
-#  summary_mcmc = summary(mcmc)
+# library(tmbstan)
+# 
+# # MCMC for both fixed and random effects
+# mcmc = tmbstan( fit$obj, init="last.par.best" )
+# summary_mcmc = summary(mcmc)
 
 ## ----echo=FALSE, message=FALSE, fig.width=7, fig.height=5, eval=FALSE---------
-#  saveRDS( summary_mcmc, file=file.path(R'(C:\Users\James.Thorson\Desktop\Git\dsem\inst\tmbstan)',"summary_mcmc.RDS") )
+# saveRDS( summary_mcmc, file=file.path(R'(C:\Users\James.Thorson\Desktop\Git\dsem\inst\tmbstan)',"summary_mcmc.RDS") )
 
 ## ----echo=FALSE, message=FALSE, fig.width=6, fig.height=4, out.width = "100%", eval=TRUE----
 summary_mcmc = readRDS( file.path(system.file("tmbstan",package="dsem"),"summary_mcmc.RDS") )
