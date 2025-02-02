@@ -429,8 +429,8 @@ this gives identical to results to the linear model:</p>
 </div>
 <div id="comparison-with-dynamic-linear-models" class="section level2">
 <h2>Comparison with dynamic linear models</h2>
-<p>We next demonstrate that <code>dsem</code> using a well-known
-econometric model, the Klein-1 model.</p>
+<p>We next demonstrate <code>dsem</code> using a well-known econometric
+model, the Klein-1 model.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">data</span>(KleinI, <span class="at">package=</span><span class="st">&quot;AER&quot;</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>TS <span class="ot">=</span> <span class="fu">ts</span>(<span class="fu">data.frame</span>(KleinI, <span class="st">&quot;time&quot;</span><span class="ot">=</span><span class="fu">time</span>(KleinI) <span class="sc">-</span> <span class="dv">1931</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
