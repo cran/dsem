@@ -269,6 +269,15 @@ ggarrange( p1, p2, p3,
            labels = c("Time-series data", "Estimated effects", "Fitted path digram"),
            ncol = 1, nrow = 3)
 
+## ----echo=TRUE, message=FALSE, fig.width=5, fig.height=7, warning=FALSE-------
+# Calculate total effects
+effect = total_effect( fit )
+
+# Plot total effect
+ggplot( effect) + 
+  geom_bar( aes(lag, total_effect, fill=lag), stat='identity', col='black', position='dodge' ) +
+  facet_grid( from ~ to  )
+
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 data(bering_sea)
 Z = ts( bering_sea )
