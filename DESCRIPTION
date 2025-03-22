@@ -1,8 +1,8 @@
 Package: dsem
 Type: Package
-Title: Fit Dynamic Structural Equation Models
-Version: 1.5.0
-Date: 2025-02-10
+Title: Dynamic Structural Equation Models
+Version: 1.6.0
+Date: 2025-03-21
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -17,10 +17,15 @@ Authors@R:
       person(given = "Wouter", 
  	     family = "van der Bijl",
              role = c("ctb"),
-             comment = c(ORCID = "0000-0002-7366-1868", "template for d-separation test"))
+             comment = c(ORCID = "0000-0002-7366-1868", "template for d-separation test")),
+      person(given = "Giovanni M.", 
+	     family = "Marchetti", 
+	     email = "giovanni.marchetti@unifi.it", 
+             role = c("ctr"),
+	     comment = c("creator of ggm, from which functions are copied to avoid dependency on package graph not on CRAN"))
     )
 Imports: TMB, Matrix, sem, igraph, utils, RTMB (>= 1.7.0), ggraph,
-        ggplot2, grid, methods, stats, ggm
+        ggplot2, grid, methods, stats
 Depends: R (>= 4.0.0),
 Suggests: knitr, AER, phylopath, rmarkdown, reshape, gridExtra, dynlm,
         MARSS, ggpubr, vars, testthat, DHARMa
@@ -39,11 +44,13 @@ LazyData: true
 URL: https://james-thorson-noaa.github.io/dsem/
 BugReports: https://github.com/James-Thorson-NOAA/dsem/issues
 NeedsCompilation: yes
-Packaged: 2025-02-13 02:12:49 UTC; James.Thorson
+Packaged: 2025-03-22 00:45:02 UTC; james
 Author: James Thorson [aut, cre] (<https://orcid.org/0000-0001-7415-1010>),
   Maurice Goodman [ctb] (<https://orcid.org/0000-0002-6874-2313>),
   Wouter van der Bijl [ctb] (<https://orcid.org/0000-0002-7366-1868>,
-    template for d-separation test)
+    template for d-separation test),
+  Giovanni M. Marchetti [ctr] (creator of ggm, from which functions are
+    copied to avoid dependency on package graph not on CRAN)
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2025-02-13 03:40:02 UTC
+Date/Publication: 2025-03-22 01:10:02 UTC
