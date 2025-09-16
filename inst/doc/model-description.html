@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="James T. Thorson" />
+
+
+<title>dsem model description</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">dsem model description</h1>
+<h4 class="author">James T. Thorson</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#dynamic-structural-equation-models" id="toc-dynamic-structural-equation-models">Dynamic structural equation
+models</a>
+<ul>
+<li><a href="#viewpoint-1-software-interface" id="toc-viewpoint-1-software-interface">Viewpoint 1: Software
+interface</a></li>
+<li><a href="#viewpoint-2-mathematical-details" id="toc-viewpoint-2-mathematical-details">Viewpoint 2: Mathematical
+details</a></li>
+<li><a href="#constructing-the-joint-path-matrix" id="toc-constructing-the-joint-path-matrix">Constructing the joint path
+matrix</a></li>
+<li><a href="#initial-conditions-and-total-effects" id="toc-initial-conditions-and-total-effects">Initial conditions and
+total effects</a></li>
+<li><a href="#constant-conditional-vs.-marginal-variance" id="toc-constant-conditional-vs.-marginal-variance">Constant conditional
+vs. marginal variance</a></li>
+<li><a href="#reduced-rank-models" id="toc-reduced-rank-models">Reduced
+rank models</a></li>
+</ul></li>
+</ul>
+</div>
+
+<!-- math bold nonitalic -->
+<!-- math nonitalic -->
+<div id="dynamic-structural-equation-models" class="section level1">
+<h1>Dynamic structural equation models</h1>
+<p>dsem involves specifying a dynamic structural equation model (DSEM).
+This DSEM be viewed either:</p>
+<ol style="list-style-type: decimal">
+<li><em>Weak interpretation</em>: as an expressive interface to
+parameterize the correlation among variables, using as many or few
+parameters as might be appropriate; or</li>
+<li><em>Strong interpretation</em>: as a structural causal model,
+allowing predictions about the consequence of counterfactual changes to
+the system.</li>
+</ol>
+<p>We introduce DSEM first from the perspective of a software user
+(i.e., the interface) and then from the perspective of a statistician
+(i.e., the equations and their interpretation).</p>
+<div id="viewpoint-1-software-interface" class="section level3">
+<h3>Viewpoint 1: Software interface</h3>
+<p>To specify a DSEM, the user uses <em>arrow-and-lag notation</em>,
+based on <em>arrow notation</em> derived from package <code>sem</code>.
+For example, to specify a first-order autoregressive process with
+variable <span class="math inline">\(x\)</span> this involves:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>x <span class="ot">-&gt;</span> x, <span class="dv">1</span>, ar1</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>x <span class="ot">&lt;-</span><span class="er">&gt;</span> x, <span class="dv">0</span>, sd</span></code></pre></div>
+<p>This then estimates a single parameter representing first-order
+autoregression (represented with a one-headed arrow), as well as the
+Cholesky decomposition of the exogenous covariance of of model variables
+(specified with two-headed arrows). See <code>?make_dsem_ram</code>
+Details section for more details about syntax.</p>
+<p>If there were four time-intervals (<span class="math inline">\(T=4\)</span>) this would then result in the path
+matrix:</p>
+<p><span class="math display">\[
+\mathbf P_{\mathrm{joint}} =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 &amp; 0 \\
+  \rho &amp; 0 &amp; 0 &amp; 0 \\
+  0 &amp; \rho &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; \rho &amp; 0
+\end{pmatrix}
+\]</span> This joint path matrix then represents the partial effect of
+each variable and time (column) on each other variable and time
+(row).</p>
+<p>DSEM interactions can be as complicated or simple as desired, and can
+include:</p>
+<ol style="list-style-type: decimal">
+<li>Latent variables and loops (i.e., they are not restricted to
+directed acyclic graphs);</li>
+<li>Values that are fixed a priori, where the
+<code>parameter_name</code> is provided as <code>NA</code> and the
+starting value that follows is the fixed value;</li>
+<li>Values that are mirrored among path coefficients, where the same
+<code>parameter_name</code> is provided for multiple rows of the text
+file.</li>
+</ol>
+<p>The user also specifies a distribution for measurement errors for
+each variable using arguement <code>family</code>, and whether each
+time-series starts from its stationary distribution or from some
+non-equilibrium initial condition using argument
+<code>estimate_delta0</code>. If the latter is specified, then variables
+will tend to converge back on the stationary distribution at a rate that
+is determined by estimated parameters.</p>
+</div>
+<div id="viewpoint-2-mathematical-details" class="section level3">
+<h3>Viewpoint 2: Mathematical details</h3>
+<p>The DSEM defines a generalized linear mixed model (GLMM) for a <span class="math inline">\(T \times J\)</span> matrix <span class="math inline">\(\mathbf{Y}\)</span>, where <span class="math inline">\(y_{tj}\)</span> is the measurement in time <span class="math inline">\(t\)</span> for variable <span class="math inline">\(j\)</span>. This measurement matrix can include
+missing values <span class="math inline">\(y_{tj} =
+\mathrm{NA}\)</span>, and it will estimate a <span class="math inline">\(T \times J\)</span> matrix of latent states <span class="math inline">\(\mathbf{X}\)</span> for all modeled times and
+variables.</p>
+<p>DSEM includes multiple distribution for measurement errors. For
+example, if the user specifies <code>family[j] = &quot;fixed&quot;</code>
+then:</p>
+<p><span class="math display">\[
+y_{tj} = x_{tj} + d_{tj}
+\]</span> for all years. Alternatively, if the user specifies
+<code>family[j] = &quot;normal&quot;</code> then: <span class="math display">\[
+y_{tj} \sim \mathrm{Normal}( x_{tj} + d_{tj}, {\sigma_j}^2)
+\]</span> and <span class="math inline">\({\sigma_j}^2\)</span> is then
+included as an estimated parameter. These expressions include the <span class="math inline">\(T \times J\)</span> matrix <span class="math inline">\(\mathbf D\)</span> representing the ongoing impact
+of initial conditions <span class="math inline">\(d_{tj}\)</span> for
+each variable and year, as explained in detail below.</p>
+<p>The specified DSEM then results in Gaussian Markov random field for
+latent states:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf X) \sim \mathrm{GMRF}(\mathbf{0,
+Q}_{\mathrm{joint}})
+\]</span> where <span class="math inline">\(\mathbf
+Q_{\mathrm{joint}}\)</span> is a <span class="math inline">\(TJ \times
+TJ\)</span> precision matrix such that <span class="math inline">\(\mathbf{Q_{\mathrm{joint}}}^{-1}\)</span> is the
+estimated covariance among latent states. This joint precision is itself
+constructed from a joint path matrix <span class="math inline">\(\mathbf
+P_{\mathrm{joint}}\)</span> and a joint matrix of exogenous covariance
+<span class="math inline">\(\mathbf G_{\mathrm{joint}}\)</span>:</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{joint}} = ({\mathbf{I - P}_{\mathrm{joint}}}^T)
+\mathbf G_{\mathrm{joint}}^{-1} \mathbf G_{\mathrm{joint}}^{-T}
+(\mathbf{I - P_{\mathrm{joint}}})
+\]</span></p>
+</div>
+<div id="constructing-the-joint-path-matrix" class="section level3">
+<h3>Constructing the joint path matrix</h3>
+<p>The joint path matrix is itself constructed by summing across lagged
+and simultaneous effects. Say we specify a model with <span class="math inline">\(K=2\)</span> one-headed arrows. For each
+one-headed arrow, we define a <span class="math inline">\(J \times
+J\)</span> path matrix <span class="math inline">\(\mathbf P_k\)</span>
+and a lag matrix <span class="math inline">\(\mathbf L_k\)</span>. For
+example, in a model with <span class="math inline">\(J=3\)</span>
+variables <span class="math inline">\((A,B,C)\)</span> and <span class="math inline">\(T=4\)</span> times, and specifying <span class="math inline">\(K=2\)</span> one-headed arrows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>A <span class="ot">-&gt;</span> B, <span class="dv">0</span>, b_AB</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>B <span class="ot">-&gt;</span> C, <span class="dv">1</span>, b_BC</span></code></pre></div>
+<p>this then results two path matrices:</p>
+<p><span class="math display">\[
+\mathbf P_1 =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 \\
+  b_{AB} &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 0 \\
+\end{pmatrix}
+\]</span> and <span class="math display">\[
+\mathbf P_2 =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 0 \\
+  0 &amp; b_{BC} &amp; 0 \\
+\end{pmatrix}
+\]</span> with corresponding lag matrices</p>
+<p><span class="math display">\[
+\mathbf L_{1} =
+\begin{pmatrix}
+  1 &amp; 0 &amp; 0 &amp; 0 \\
+  0 &amp; 1 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 1 &amp; 0 \\
+  0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}
+\]</span> and <span class="math display">\[
+\mathbf L_{2} =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 &amp; 0 \\
+  1 &amp; 0 &amp; 0 &amp; 0 \\
+  0 &amp; 1 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 1 &amp; 0
+\end{pmatrix}
+\]</span> We then sum across the Kronecker product of these components
+to obtain the joint path matrix:</p>
+<p><span class="math display">\[
+\mathbf P_{\mathrm{joint}} = \sum_{k=1}^{K}(\mathbf L_k \otimes \mathbf
+P_k)
+\]</span> where <span class="math inline">\(\otimes\)</span> is the
+Kronecker product. Similarly, the exogenous covariance is similar
+constructed from a Kronecker product, although we assume that all
+covariance is simultaneous (i.e., no lags are allowed for two-headed
+arrows):</p>
+<p><span class="math display">\[
+\mathbf G_{\mathrm{joint}} = \mathbf I \otimes \mathbf G
+\]</span></p>
+<p>These matrices are define a simultaneous equation model:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf X) = \mathbf P_{\mathrm{joint}}
+\mathrm{vec}(\mathbf X) + \mathbf\epsilon \\
+\mathbf\epsilon \sim \mathrm{MVN}( \mathbf 0,
+\mathbf{G_{\mathrm{joint}}}^T \mathbf G_{\mathrm{joint}} )
+\]</span> and the precision matrix can be derived from this simultaneous
+equation.</p>
+</div>
+<div id="initial-conditions-and-total-effects" class="section level3">
+<h3>Initial conditions and total effects</h3>
+<p>Imagine we have some exogenous intervention that caused a <span class="math inline">\(T \times J\)</span> matrix of changes <span class="math inline">\(\mathbf C\)</span>. The total effect of this
+exogenous intervention would then be <span class="math inline">\((\mathbf{I - P}_{\mathrm{joint}})^{-1}
+\mathrm{vec}(\mathbf C)\)</span>, and we can calculate any total effect
+using this matrix inverse <span class="math inline">\((\mathbf{I -
+P}_{\mathrm{joint}})^{-1}\)</span> (called the “Leontief matrix”). To
+see this, consider that the first-order effect of change <span class="math inline">\(\mathbf C\)</span> is <span class="math inline">\(\mathbf P_{\mathrm{joint}} \mathrm{vec}(\mathbf
+C)\)</span>, but this response then in turn causes a second-order effect
+<span class="math inline">\(\mathbf{P_{\mathrm{joint}}}^2
+\mathrm{vec}(\mathbf C)\)</span>, and so on. The total effect is
+therefore:</p>
+<p><span class="math display">\[
+\sum_{l=1}^{\infty} \mathbf{P_{\mathrm{joint}}}^l = (\mathbf{I -
+P}_{\mathrm{joint}})^{-1}
+\]</span> where this power-series of direct and indirect effects then
+results in the Leontief matrix (as long as the <span class="math inline">\(\mathbf{I - P}\)</span> is invertible).</p>
+<p>We can use this expression to calculate the matrix <span class="math inline">\(\mathbf D\)</span> represents the ongoing effect
+of initial conditions. It is constructed from a <span class="math inline">\(J\)</span> length vector of estimated initial
+conditions <span class="math inline">\(\mathbf\delta_1\)</span> in time
+<span class="math inline">\(t=1\)</span>, and we construct a <span class="math inline">\(T \times J\)</span> matrix <span class="math inline">\(\mathbf\Delta\)</span> where the first row
+(corresponding to year <span class="math inline">\(t=1\)</span>) is
+<span class="math inline">\(\mathbf\delta_1\)</span> and all other
+elements are <span class="math inline">\(0\)</span>. The ongoing effect
+of initial conditions can then be calculated as:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf D) = (\mathbf{I - P}_{\mathrm{joint}})^{-1}
+\mathrm{vec}(\mathbf\Delta)
+\]</span> Calculating the effect of initial conditions is in a sense the
+total effect of <span class="math inline">\(\mathbf\delta_1\)</span> in
+year <span class="math inline">\(t=1\)</span> on subsequent years.
+Calculating the effect <span class="math inline">\(\mathbf D\)</span> of
+initial conditions involves inverting <span class="math inline">\(\mathbf{I - P}_{\mathrm{joint}}\)</span>, but this
+is computationally efficient using a sparse LU decomposition.</p>
+</div>
+<div id="constant-conditional-vs.-marginal-variance" class="section level3">
+<h3>Constant conditional vs. marginal variance</h3>
+<p>We have defined the joint precision for a GMRF based on a path matrix
+and matrix of exogenous covariances. The exogenous (or conditional)
+variances are stationary for each variable over time, and some path
+matrices will result in a nonstationary marginal variance. To see this,
+consider a first-order autoregressive process</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>dsem <span class="ot">=</span> <span class="st">&quot; </span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="st">x -&gt; x, 1, ar1, 0.8</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="st">x &lt;-&gt; x, 0, sd, 1</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="st">&quot;</span></span></code></pre></div>
+<p>We can parse this DSEM and construct the precision using internal
+functions:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Load package</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">library</span>(dsem)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># call dsem without estimating parameters</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(<span class="fu">data.frame</span>( <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">10</span>) )),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">sem =</span> dsem,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="at">run_model =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  )</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>Sigma1 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_kk))</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="fu">plot</span>( <span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y =</span> <span class="fu">diag</span>(Sigma1), <span class="at">xlab=</span><span class="st">&quot;time&quot;</span>, </span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>      <span class="at">ylab=</span><span class="st">&quot;Marginal variance&quot;</span>, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, </span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>      <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fu">max</span>(<span class="fu">diag</span>(Sigma1))))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>where we can see that the diagonal of this covariance matrix is
+non-constant.</p>
+<p>We therefore derive an alternative specification that preserves a
+stationary marginal variance by rescaling the exogenous (conditional)
+variance.</p>
+<p>Specifically, we see that the marginal variance is:</p>
+<p><span class="math display">\[
+\mathrm{Var}(\mathbf X) = \mathrm{diag}(\mathbf\Sigma) = \mathbf{ L L}^T
+\\
+\mathbf L = (\mathbf{I - P}_{\mathrm{joint}})^{-1} \mathbf G
+\]</span> Given the properties of the Hadamard (elementwise) product,
+this can be rewritten as:</p>
+<p><span class="math display">\[
+\mathrm{diag}(\mathbf\Sigma) = \mathbf{(L \circ L) 1}
+\]</span> Now suppose we have a desired vector of length <span class="math inline">\(TJ\)</span> for the constant marginal variance
+<span class="math inline">\(\mathbf v\)</span>. We can solve for the
+exogenous covariance that would result in that marginal variance:</p>
+<p><span class="math display">\[
+\mathbf u = \mathbf{(L \circ L)}^{-1} \mathbf v
+\]</span></p>
+<p>and we can then rescale the exogenous covariance:</p>
+<p><span class="math display">\[
+\mathrm{diag}(\mathbf G^*) = \mathbf u
+\]</span> and then using this rescaled exogenous covariance when
+constructing the precision of the GMRF. We can see this again using our
+first-order autoregressive example</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># call dsem without estimating parameters</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(<span class="fu">data.frame</span>( <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">10</span>) )),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">sem =</span> dsem,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="at">run_model =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="at">constant_variance =</span> <span class="st">&quot;marginal&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  )</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>Sigma2 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_kk))</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">plot</span>( <span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y =</span> <span class="fu">diag</span>(Sigma2), <span class="at">xlab=</span><span class="st">&quot;time&quot;</span>, </span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>      <span class="at">ylab=</span><span class="st">&quot;Marginal variance&quot;</span>, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, </span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>      <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fu">max</span>(<span class="fu">diag</span>(Sigma1))))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>This shows that the corrected (nonstationary) exogenous variance
+results in a stationary marginal variance for the AR1 process. This
+correction can be done in two different ways that are identical when the
+exogenous covariance is diagonal (as it is in this simple example), but
+differ when specifying some exogenous covariance. However, we do not
+discuss this in detail here. Note that this calculating this correction
+for a constant marginal variance requires the inverse of the squared
+values of Leontief matrix (which is itself a matrix inverse). It
+therefore is computationally expensive for large models containing
+complicated dependencies.</p>
+</div>
+<div id="reduced-rank-models" class="section level3">
+<h3>Reduced rank models</h3>
+<p>We note that some DSEM specifications will be reduced rank. This
+arises for example when specifying a dynamic factor analysis, where
+<span class="math inline">\(J\)</span> variables are explained by <span class="math inline">\(F &lt; J\)</span> factors that each follow a
+random walk:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>dsem <span class="ot">=</span> <span class="st">&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="st">  # Factor follows random walk with unit variance</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="st">  F &lt;-&gt; F, 0, NA, 1</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="st">  F -&gt; F, 1, NA, 1</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="st">  # Loadings on two manifest variables</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="st">  F -&gt; x, 0, b_x, 1</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="st">  F -&gt; y, 0, b_y, 1</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="st">  # No residual variance for manifest variables</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="st">  x &lt;-&gt; x, 0, NA, 0</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="st">  y &lt;-&gt; y, 0, NA, 0</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">data.frame</span>( </span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">10</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">rnorm</span>(<span class="dv">10</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="at">F =</span> <span class="fu">rep</span>(<span class="cn">NA</span>,<span class="dv">10</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>)</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co"># call dsem without estimating parameters</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(data),</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="at">sem =</span> dsem,</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>,<span class="st">&quot;normal&quot;</span>,<span class="st">&quot;fixed&quot;</span>),</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>    <span class="at">run_model =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;projection&quot;</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>  )</span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>)</span></code></pre></div>
+<p>We can extract the covariance and inspect the eigenvalues:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>IminusRho_kk <span class="ot">=</span> out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>IminusRho_kk</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>G_kk <span class="ot">=</span> out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Gamma_kk</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>Q_kk <span class="ot">=</span> <span class="fu">t</span>(IminusRho_kk) <span class="sc">%*%</span> <span class="fu">t</span>(G_kk) <span class="sc">%*%</span> G_kk <span class="sc">%*%</span> IminusRho_kk</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co"># Display eigenvalues</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">eigen</span>(Q_kk)<span class="sc">$</span>values</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;  [1] 3.91114561 3.65247755 3.24697960 2.73068205 2.14946019 1.55495813</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt;  [7] 1.00000000 0.53389626 0.19806226 0.02233835 0.00000000 0.00000000</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [13] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [19] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; [25] 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000 0.00000000</span></span></code></pre></div>
+<p>where this shows that the precision has a rank of 10 while being a
+<span class="math inline">\(30 \times 30\)</span> matrix. We therefore
+cannot evaluate the probability density of state matrix <span class="math inline">\(\mathbf X\)</span> using this precision matrix
+(i.e., the log-determinant is not defined).</p>
+<p>To address this circumstance, we can switch to using
+<code>gmrf_parameterization = &quot;projection&quot;</code>. This evaluates the
+probability density of a set of innovations <span class="math inline">\(\mathbf X^*\)</span> that follow a unit
+variance:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf X)^* \sim \mathrm{GMRF}(\mathbf{0, I})
+\]</span> and then projects these full-rank innovations to the reduced
+rank states:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf X) = (\mathbf{I - P}_{\mathrm{joint}})^{-1} \mathbf
+G_{\mathrm{joint}} \mathrm{vec}(\mathbf X)^*
+\]</span></p>
+<p>This parameterization allows us to fit DSEM using a rank-deficient
+structural model.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

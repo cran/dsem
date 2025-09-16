@@ -1,8 +1,8 @@
 Package: dsem
 Type: Package
 Title: Dynamic Structural Equation Models
-Version: 1.6.0
-Date: 2025-03-21
+Version: 1.7.0
+Date: 2025-09-15
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -38,19 +38,21 @@ Description: Applies dynamic structural equation models to time-series data
 	constrained by ecological mechanisms."  
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 LazyData: true
 URL: https://james-thorson-noaa.github.io/dsem/
 BugReports: https://github.com/James-Thorson-NOAA/dsem/issues
 NeedsCompilation: yes
-Packaged: 2025-03-22 00:45:02 UTC; james
-Author: James Thorson [aut, cre] (<https://orcid.org/0000-0001-7415-1010>),
-  Maurice Goodman [ctb] (<https://orcid.org/0000-0002-6874-2313>),
-  Wouter van der Bijl [ctb] (<https://orcid.org/0000-0002-7366-1868>,
-    template for d-separation test),
+Packaged: 2025-09-16 00:03:53 UTC; James.Thorson
+Author: James Thorson [aut, cre] (ORCID:
+    <https://orcid.org/0000-0001-7415-1010>),
+  Maurice Goodman [ctb] (ORCID: <https://orcid.org/0000-0002-6874-2313>),
+  Wouter van der Bijl [ctb] (ORCID:
+    <https://orcid.org/0000-0002-7366-1868>, template for d-separation
+    test),
   Giovanni M. Marchetti [ctr] (creator of ggm, from which functions are
     copied to avoid dependency on package graph not on CRAN)
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2025-03-22 01:10:02 UTC
+Date/Publication: 2025-09-16 02:40:02 UTC
