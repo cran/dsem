@@ -49,8 +49,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -144,6 +145,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -350,8 +373,7 @@ models</a>
 interface</a></li>
 <li><a href="#viewpoint-2-mathematical-details" id="toc-viewpoint-2-mathematical-details">Viewpoint 2: Mathematical
 details</a></li>
-<li><a href="#constructing-the-joint-path-matrix" id="toc-constructing-the-joint-path-matrix">Constructing the joint path
-matrix</a></li>
+<li><a href="#measurement-errors" id="toc-measurement-errors">Measurement errors</a></li>
 <li><a href="#initial-conditions-and-total-effects" id="toc-initial-conditions-and-total-effects">Initial conditions and
 total effects</a></li>
 <li><a href="#constant-conditional-vs.-marginal-variance" id="toc-constant-conditional-vs.-marginal-variance">Constant conditional
@@ -359,6 +381,7 @@ vs. marginal variance</a></li>
 <li><a href="#reduced-rank-models" id="toc-reduced-rank-models">Reduced
 rank models</a></li>
 </ul></li>
+<li><a href="#works-cited" id="toc-works-cited">Works cited</a></li>
 </ul>
 </div>
 
@@ -366,8 +389,9 @@ rank models</a></li>
 <!-- math nonitalic -->
 <div id="dynamic-structural-equation-models" class="section level1">
 <h1>Dynamic structural equation models</h1>
-<p>dsem involves specifying a dynamic structural equation model (DSEM).
-This DSEM be viewed either:</p>
+<p>Package <em>dsem</em> <span class="citation">(Thorson et al.
+2024)</span> involves specifying a dynamic structural equation model
+(DSEM). This DSEM be viewed either:</p>
 <ol style="list-style-type: decimal">
 <li><em>Weak interpretation</em>: as an expressive interface to
 parameterize the correlation among variables, using as many or few
@@ -382,9 +406,9 @@ the system.</li>
 <div id="viewpoint-1-software-interface" class="section level3">
 <h3>Viewpoint 1: Software interface</h3>
 <p>To specify a DSEM, the user uses <em>arrow-and-lag notation</em>,
-based on <em>arrow notation</em> derived from package <code>sem</code>.
-For example, to specify a first-order autoregressive process with
-variable <span class="math inline">\(x\)</span> this involves:</p>
+based on <em>arrow notation</em> derived from package <code>sem</code>
+<span class="citation">(Fox 2006)</span>. For example, to specify a
+first-order autoregressive process with variable <span class="math inline">\(x\)</span> this involves:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>x <span class="ot">-&gt;</span> x, <span class="dv">1</span>, ar1</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>x <span class="ot">&lt;-</span><span class="er">&gt;</span> x, <span class="dv">0</span>, sd</span></code></pre></div>
 <p>This then estimates a single parameter representing first-order
@@ -430,7 +454,153 @@ is determined by estimated parameters.</p>
 <p>The DSEM defines a generalized linear mixed model (GLMM) for a <span class="math inline">\(T \times J\)</span> matrix <span class="math inline">\(\mathbf{Y}\)</span>, where <span class="math inline">\(y_{tj}\)</span> is the measurement in time <span class="math inline">\(t\)</span> for variable <span class="math inline">\(j\)</span>. This measurement matrix can include
 missing values <span class="math inline">\(y_{tj} =
 \mathrm{NA}\)</span>, and it will estimate a <span class="math inline">\(T \times J\)</span> matrix of latent states <span class="math inline">\(\mathbf{X}\)</span> for all modeled times and
-variables.</p>
+variables, where <span class="math inline">\(\mathbf{x}_t\)</span> is
+the vector of states in time <span class="math inline">\(t\)</span> and
+<span class="math inline">\(\text{vec}(\mathbf{X})\)</span> is a <span class="math inline">\(TJ\)</span> length vector constructed by stacking
+columns. DSEM also estimates a <span class="math inline">\(T \times
+J\)</span> matrix of process errors <span class="math inline">\(\mathbf{E}\)</span> where <span class="math inline">\(\mathbf{\epsilon}_t\)</span> is the vector of
+process errors in time <span class="math inline">\(t\)</span>, and <span class="math inline">\(\text{vec}(\mathbf{E})\)</span> is the <span class="math inline">\(TJ\)</span> vector of stacked columns.</p>
+<p>DSEM can be written in structural vector-autoregressive (SVAR)
+notation as a SVAR model of arbitrary lag, from lag-0 upwards:</p>
+<p><span class="math display">\[
+\mathbf{x}_t = \underbrace{\mathbf{P}_0
+\mathbf{x}_t}_{\text{Simultaneous effects}} +
+\underbrace{\mathbf{P}_1 \mathbf{x}_{t-1}}_{\text{Lag-1 effects}} +
+\underbrace{\mathbf{P}_2 \mathbf{x}_{t-2}}_{\text{Lag-2 effects}} +
+\underbrace{...}_{\text{Higher-order lags}} +
+\mathbf{\epsilon}_t
+\]</span> where <span class="math inline">\(\mathbf{P}_0\)</span> is the
+<span class="math inline">\(J \times J\)</span> matrix of simultaneous
+interactions (the inclusion of which distinguishes an SVAR from a VAR),
+<span class="math inline">\(\mathbf{P}_1\)</span> and <span class="math inline">\(\mathbf{P}_2\)</span> are interactions occurring
+at lag-1 and lag-2, respectively, and it can also include higher-order
+lags (not shown here). Additionally, <span class="math inline">\(\mathbf{\epsilon}_t\)</span> is exogenous
+covariation in time <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[
+\mathbf{\epsilon}_t \sim \text{MVN}(\mathbf{0,GG}^T)
+\]</span> and <span class="math inline">\(\mathbf{G}\)</span> is the
+square-root of exogenous covariance <span class="math inline">\(\mathbf{GG}^T\)</span> that occurs in each time.
+<span class="math inline">\(\mathbf{G}\)</span> is then estimated by
+DSEM, and is identifiable without constraints when specified as a
+lower-triangle matrix (representing the Cholesky decomposition of the
+covariance of exogenous process errors occurring in each time).</p>
+<p>This VAR notation can also be rewritten as a joint simultaneous
+equation model (SEM):</p>
+<p><span class="math display">\[
+\text{vec}(\mathbf{X}) = \mathbf{P}_{\text{joint}}
+\text{vec}(\mathbf{X}) + \text{vec}(\mathbf{E})
+\]</span></p>
+<p>where: <span class="math display">\[
+\text{vec}(\mathbf{E}) \sim
+\text{MVN}(\mathbf{0},\mathbf{G}_{\text{joint}}
+\mathbf{G}_{\text{joint}}^T)
+\]</span> We sum across the Kronecker product of interaction matrices
+and lag matrices to obtain the joint path matrix:</p>
+<p><span class="math display">\[
+\mathbf P_{\mathrm{joint}} = \sum_{g=0}^{T}(\mathbf L_g \otimes \mathbf
+P_g)
+\]</span> where <span class="math inline">\(\otimes\)</span> is the
+Kronecker product, <span class="math inline">\(g\)</span> is the lag
+index, <span class="math inline">\(T\)</span> is the highest-order lag
+that can be included, and <span class="math inline">\(\mathbf{L}_g\)</span> is a matrix representing
+lag-g (see example below). Similarly, the exogenous covariance is
+constructed from a Kronecker product, although we assume that all
+covariance is simultaneous (i.e., no lags are allowed for two-headed
+arrows):</p>
+<p><span class="math display">\[
+\mathbf G_{\mathrm{joint}} = \mathbf L_0 \otimes \mathbf G
+\]</span> where <span class="math inline">\(\mathbf{L}_0\)</span> is a
+<span class="math inline">\(T \times T\)</span> lag-0 (identity)
+matrix.</p>
+<p>For illustration, when <span class="math inline">\(T=4\)</span> and
+given a maximum lag of 2, we can write <span class="math inline">\(\mathbf{P}_{\text{joint}}\)</span> as:</p>
+<p><span class="math display">\[
+\mathbf{P}_{\text{joint}} =
+\begin{pmatrix}
+  \mathbf{P}_0 &amp; 0 &amp; 0 &amp; 0\\
+  \mathbf{P}_1 &amp; \mathbf{P}_0 &amp; 0 &amp; 0\\
+  \mathbf{P}_2 &amp; \mathbf{P}_1 &amp; \mathbf{P}_0 &amp; 0\\
+  0 &amp; \mathbf{P}_2 &amp; \mathbf{P}_1 &amp; \mathbf{P}_0 \\
+\end{pmatrix}
+\]</span> and <span class="math inline">\(\mathbf{G}_{\text{joint}}\)</span> as:</p>
+<p><span class="math display">\[
+\mathbf{G}_{\text{joint}} =
+\begin{pmatrix}
+  \mathbf{G} &amp; 0 &amp; 0 &amp; 0\\
+  0 &amp; \mathbf{G} &amp; 0 &amp; 0\\
+  0 &amp; 0 &amp; \mathbf{G} &amp; 0\\
+  0 &amp; 0 &amp; 0 &amp; \mathbf{G} \\
+\end{pmatrix}
+\]</span> The DSEM then results in Gaussian Markov random field for
+latent states:</p>
+<p><span class="math display">\[
+\mathrm{vec}(\mathbf X) \sim \mathrm{GMRF}(\mathbf{0,
+Q}_{\mathrm{joint}})
+\]</span> where <span class="math inline">\(\mathbf
+Q_{\mathrm{joint}}\)</span> is a <span class="math inline">\(TJ \times
+TJ\)</span> precision matrix such that <span class="math inline">\(\mathbf{Q_{\mathrm{joint}}}^{-1}\)</span> is the
+estimated covariance among latent states. This joint precision is itself
+constructed from the joint path matrix <span class="math inline">\(\mathbf P_{\mathrm{joint}}\)</span> and the joint
+exogenous covariance matrix <span class="math inline">\(\mathbf
+G_{\mathrm{joint}}\)</span>:</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{joint}} = ({\mathbf{I - P}_{\mathrm{joint}}}^T)
+(\mathbf G_{\mathrm{joint}} \mathbf G_{\mathrm{joint}}^T)^{-1}
+(\mathbf{I - P_{\mathrm{joint}}})
+\]</span></p>
+<p>Finally, it is convenient to write the joint path matrix by summing
+across path coefficients <span class="math inline">\(k\)</span> rather
+than lags <span class="math inline">\(g\)</span>:</p>
+<p><span class="math display">\[
+\mathbf P_{\mathrm{joint}} = \sum_{k=1}^{K}(\mathbf L_{g[k]} \otimes
+\mathbf P_k)
+\]</span> where <span class="math inline">\(g[k]\)</span> is the lag
+associated with path coefficient <span class="math inline">\(k\)</span>,
+and <span class="math inline">\(\mathbf{P}_k\)</span> is a <span class="math inline">\(J \times J\)</span> matrix with only a single
+non-zero value (with non-zero value equal to path coefficient <span class="math inline">\(k\)</span>).</p>
+<p>Say we specify a model with <span class="math inline">\(K=2\)</span>
+two interactions (one-headed arrows). For each one-headed arrow, we
+define a <span class="math inline">\(J \times J\)</span> path matrix
+<span class="math inline">\(\mathbf P_k\)</span> and a lag matrix <span class="math inline">\(\mathbf L_{g[k]}\)</span>. For example, in a model
+with <span class="math inline">\(J=3\)</span> variables <span class="math inline">\(\mathbf{X = (A,B,C)}\)</span> and <span class="math inline">\(T=4\)</span> times, and specifying <span class="math inline">\(K=2\)</span> one-headed arrows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>A <span class="ot">-&gt;</span> B, <span class="dv">0</span>, b_AB</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>B <span class="ot">-&gt;</span> C, <span class="dv">1</span>, b_BC</span></code></pre></div>
+<p>this then results two path matrices:</p>
+<p><span class="math display">\[
+\mathbf P_{k=1} =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 \\
+  b_{AB} &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 0 \\
+\end{pmatrix}
+\]</span> and <span class="math display">\[
+\mathbf P_{k=2} =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 0 \\
+  0 &amp; b_{BC} &amp; 0 \\
+\end{pmatrix}
+\]</span> with corresponding lag matrices</p>
+<p><span class="math display">\[
+\mathbf L_{g[1]} =
+\begin{pmatrix}
+  1 &amp; 0 &amp; 0 &amp; 0 \\
+  0 &amp; 1 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 1 &amp; 0 \\
+  0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}
+\]</span> and <span class="math display">\[
+\mathbf L_{g[2]} =
+\begin{pmatrix}
+  0 &amp; 0 &amp; 0 &amp; 0 \\
+  1 &amp; 0 &amp; 0 &amp; 0 \\
+  0 &amp; 1 &amp; 0 &amp; 0 \\
+  0 &amp; 0 &amp; 1 &amp; 0
+\end{pmatrix}
+\]</span></p>
+</div>
+<div id="measurement-errors" class="section level2">
+<h2>Measurement errors</h2>
 <p>DSEM includes multiple distribution for measurement errors. For
 example, if the user specifies <code>family[j] = &quot;fixed&quot;</code>
 then:</p>
@@ -440,94 +610,22 @@ y_{tj} = x_{tj} + d_{tj}
 <code>family[j] = &quot;normal&quot;</code> then: <span class="math display">\[
 y_{tj} \sim \mathrm{Normal}( x_{tj} + d_{tj}, {\sigma_j}^2)
 \]</span> and <span class="math inline">\({\sigma_j}^2\)</span> is then
-included as an estimated parameter. These expressions include the <span class="math inline">\(T \times J\)</span> matrix <span class="math inline">\(\mathbf D\)</span> representing the ongoing impact
-of initial conditions <span class="math inline">\(d_{tj}\)</span> for
-each variable and year, as explained in detail below.</p>
-<p>The specified DSEM then results in Gaussian Markov random field for
-latent states:</p>
-<p><span class="math display">\[
-\mathrm{vec}(\mathbf X) \sim \mathrm{GMRF}(\mathbf{0,
-Q}_{\mathrm{joint}})
-\]</span> where <span class="math inline">\(\mathbf
-Q_{\mathrm{joint}}\)</span> is a <span class="math inline">\(TJ \times
-TJ\)</span> precision matrix such that <span class="math inline">\(\mathbf{Q_{\mathrm{joint}}}^{-1}\)</span> is the
-estimated covariance among latent states. This joint precision is itself
-constructed from a joint path matrix <span class="math inline">\(\mathbf
-P_{\mathrm{joint}}\)</span> and a joint matrix of exogenous covariance
-<span class="math inline">\(\mathbf G_{\mathrm{joint}}\)</span>:</p>
-<p><span class="math display">\[
-\mathbf Q_{\mathrm{joint}} = ({\mathbf{I - P}_{\mathrm{joint}}}^T)
-\mathbf G_{\mathrm{joint}}^{-1} \mathbf G_{\mathrm{joint}}^{-T}
-(\mathbf{I - P_{\mathrm{joint}}})
-\]</span></p>
+included as an estimated parameter. When estimating missing values or
+masurement errors in <span class="math inline">\(\mathbf{Y}\)</span>,
+<em>dsem</em> must then marginalize across the latent value of states
+<span class="math inline">\(\mathbf{X}\)</span>. It does this using the
+Laplace approximation <span class="citation">(Skaug and Fournier
+2006)</span>, as implemented using the R-package TMB <span class="citation">(Kristensen et al. 2016)</span>. Computations involving
+sparse matrices are efficient using the Matrix package <span class="citation">(Bates et al. 2023)</span> to interface with the Eigen
+library <span class="citation">(<span class="nocase">Guennebaud et
+al.</span> 2010)</span>.</p>
+<p>These expressions include the <span class="math inline">\(T \times
+J\)</span> matrix <span class="math inline">\(\mathbf D\)</span>
+representing the ongoing impact of initial conditions <span class="math inline">\(d_{tj}\)</span> for each variable and year, as
+explained in detail next.</p>
 </div>
-<div id="constructing-the-joint-path-matrix" class="section level3">
-<h3>Constructing the joint path matrix</h3>
-<p>The joint path matrix is itself constructed by summing across lagged
-and simultaneous effects. Say we specify a model with <span class="math inline">\(K=2\)</span> one-headed arrows. For each
-one-headed arrow, we define a <span class="math inline">\(J \times
-J\)</span> path matrix <span class="math inline">\(\mathbf P_k\)</span>
-and a lag matrix <span class="math inline">\(\mathbf L_k\)</span>. For
-example, in a model with <span class="math inline">\(J=3\)</span>
-variables <span class="math inline">\((A,B,C)\)</span> and <span class="math inline">\(T=4\)</span> times, and specifying <span class="math inline">\(K=2\)</span> one-headed arrows:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>A <span class="ot">-&gt;</span> B, <span class="dv">0</span>, b_AB</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>B <span class="ot">-&gt;</span> C, <span class="dv">1</span>, b_BC</span></code></pre></div>
-<p>this then results two path matrices:</p>
-<p><span class="math display">\[
-\mathbf P_1 =
-\begin{pmatrix}
-  0 &amp; 0 &amp; 0 \\
-  b_{AB} &amp; 0 &amp; 0 \\
-  0 &amp; 0 &amp; 0 \\
-\end{pmatrix}
-\]</span> and <span class="math display">\[
-\mathbf P_2 =
-\begin{pmatrix}
-  0 &amp; 0 &amp; 0 \\
-  0 &amp; 0 &amp; 0 \\
-  0 &amp; b_{BC} &amp; 0 \\
-\end{pmatrix}
-\]</span> with corresponding lag matrices</p>
-<p><span class="math display">\[
-\mathbf L_{1} =
-\begin{pmatrix}
-  1 &amp; 0 &amp; 0 &amp; 0 \\
-  0 &amp; 1 &amp; 0 &amp; 0 \\
-  0 &amp; 0 &amp; 1 &amp; 0 \\
-  0 &amp; 0 &amp; 0 &amp; 1
-\end{pmatrix}
-\]</span> and <span class="math display">\[
-\mathbf L_{2} =
-\begin{pmatrix}
-  0 &amp; 0 &amp; 0 &amp; 0 \\
-  1 &amp; 0 &amp; 0 &amp; 0 \\
-  0 &amp; 1 &amp; 0 &amp; 0 \\
-  0 &amp; 0 &amp; 1 &amp; 0
-\end{pmatrix}
-\]</span> We then sum across the Kronecker product of these components
-to obtain the joint path matrix:</p>
-<p><span class="math display">\[
-\mathbf P_{\mathrm{joint}} = \sum_{k=1}^{K}(\mathbf L_k \otimes \mathbf
-P_k)
-\]</span> where <span class="math inline">\(\otimes\)</span> is the
-Kronecker product. Similarly, the exogenous covariance is similar
-constructed from a Kronecker product, although we assume that all
-covariance is simultaneous (i.e., no lags are allowed for two-headed
-arrows):</p>
-<p><span class="math display">\[
-\mathbf G_{\mathrm{joint}} = \mathbf I \otimes \mathbf G
-\]</span></p>
-<p>These matrices are define a simultaneous equation model:</p>
-<p><span class="math display">\[
-\mathrm{vec}(\mathbf X) = \mathbf P_{\mathrm{joint}}
-\mathrm{vec}(\mathbf X) + \mathbf\epsilon \\
-\mathbf\epsilon \sim \mathrm{MVN}( \mathbf 0,
-\mathbf{G_{\mathrm{joint}}}^T \mathbf G_{\mathrm{joint}} )
-\]</span> and the precision matrix can be derived from this simultaneous
-equation.</p>
-</div>
-<div id="initial-conditions-and-total-effects" class="section level3">
-<h3>Initial conditions and total effects</h3>
+<div id="initial-conditions-and-total-effects" class="section level2">
+<h2>Initial conditions and total effects</h2>
 <p>Imagine we have some exogenous intervention that caused a <span class="math inline">\(T \times J\)</span> matrix of changes <span class="math inline">\(\mathbf C\)</span>. The total effect of this
 exogenous intervention would then be <span class="math inline">\((\mathbf{I - P}_{\mathrm{joint}})^{-1}
 \mathrm{vec}(\mathbf C)\)</span>, and we can calculate any total effect
@@ -539,7 +637,7 @@ C)\)</span>, but this response then in turn causes a second-order effect
 \mathrm{vec}(\mathbf C)\)</span>, and so on. The total effect is
 therefore:</p>
 <p><span class="math display">\[
-\sum_{l=1}^{\infty} \mathbf{P_{\mathrm{joint}}}^l = (\mathbf{I -
+\sum_{l=0}^{\infty} \mathbf{P_{\mathrm{joint}}}^l = (\mathbf{I -
 P}_{\mathrm{joint}})^{-1}
 \]</span> where this power-series of direct and indirect effects then
 results in the Leontief matrix (as long as the <span class="math inline">\(\mathbf{I - P}\)</span> is invertible).</p>
@@ -561,8 +659,8 @@ Calculating the effect <span class="math inline">\(\mathbf D\)</span> of
 initial conditions involves inverting <span class="math inline">\(\mathbf{I - P}_{\mathrm{joint}}\)</span>, but this
 is computationally efficient using a sparse LU decomposition.</p>
 </div>
-<div id="constant-conditional-vs.-marginal-variance" class="section level3">
-<h3>Constant conditional vs. marginal variance</h3>
+<div id="constant-conditional-vs.-marginal-variance" class="section level2">
+<h2>Constant conditional vs. marginal variance</h2>
 <p>We have defined the joint precision for a GMRF based on a path matrix
 and matrix of exogenous covariances. The exogenous (or conditional)
 variances are stationary for each variable over time, and some path
@@ -588,11 +686,11 @@ functions:</p>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>)</span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a></span>
 <span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>Sigma1 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_kk))</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>Sigma1 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_oo))</span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="fu">plot</span>( <span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y =</span> <span class="fu">diag</span>(Sigma1), <span class="at">xlab=</span><span class="st">&quot;time&quot;</span>, </span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>      <span class="at">ylab=</span><span class="st">&quot;Marginal variance&quot;</span>, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, </span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>      <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fu">max</span>(<span class="fu">diag</span>(Sigma1))))</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAUVBMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6kNtmAABmADpmtrZmtv+QOgCQZgCQ2/+2ZgC2/7a2///bkDrb/7bb////tmb/25D//7b//9v////9m+XQAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAHq0lEQVR4nO2dbXfbKBCFnRdv7W680UatbOv//9A1kmXHzYoLDAMj5T7ntF9KQX6M0DAgvOmJl03tC7AOBQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCAJ8Enfabl9/Nrt61mOQuqHt6b19+n/Y09MBN0Pmw6y+C+vb5o+b1mOMm6LR/GwR1FPTAlx7UXP6QO3+OQe3mreLVGOTxKbbZPL3LqlsMCYJysJiwioIAKYLc8NxtZGHQmgWNj6/T/rVIu+V5HH3iBbk4yCGLg8wIQqNyvCAXBzlkkXRNQVEPqYRbbIyAjlvRIFRDUOyDe/xPCQWP2408DhL977imksTc/nf2glWq+78WRF7u1WQvWKW6h6pzeLnXFl/wfBivwOIgndHMVGN8wSZHnkNBUH45Q63RBfOkEnN/zypyhpqjC06BYlpzmYbOP+vMV9uX2qMLng+iOUZsu7Ai5edhwhjU5UiV5flYqn3n2kR0wSFdZuIppm+nX3IcVETPYgUVuLemluILTvdYvVusmJ0+NWHWvl5mrKKhOv0jlus8Y3PRBV2g2LmVVd+6GJyOpH7Isnb61EDx+ONj+DNHO2WsZ1PXibmH8mmktIzi6ee7T9CUdLww189SPmkFPWkZxct90+x8t9in2chc5jr+s1bRk7js8+qeZJ6HmEIPqqRHKw66LdxnGoOq6VELFKdYafY2jKmuop4lRNJV9UQLugRBhSertVcYtS90bnkxtLrafgQrq2nNRWYUq/spnXKNbLe+n6SMYrFVDQN+tDKK7eXfh44mGYMs+NEKFJ/erxuIBIJM+NERNI7j54NnuzmuzoYfnYziNI671FqioMrh4R2VjOItEmheEwVZ0aOVUZy0zE/6/e3a8aOUUbxN58+HFEGG/OhkFIXtWvKjk1GUtWvKj05GUdSuLT/28kHG/JgTZM1P0lNMcX+QOT9JgaJ8l/Rcu/b8JN5inZtqKLzMshpBvScEFLRr0I+kB6VkXr0pV4t+kiJppTHIpB9LT7G1CNJq16YfO4KM+jEjyKofCkIYEWTWjxFBdv3E7+64h3q+SDpul6thP1oLh3G7XL+doMg9ipb96C4c9kG7XE37UV44DOlBtv1oLRxG7HJdoaCAhcPwXa7G/VRfOLTup/bCoXk/6guHYHfHOgVJmntMudr3Y2QuZpgEQZYPN8lPSqBo9HATHdICxYLt1iYtUAQEJEVWLCjkcBO87LpiQUGHm0CLKxYU9r4YsrhiQYXbrQ0FASgIEL2qUfqd1dqwBwEoCCB4zG8kh72tWNA1EX8JdCSzshULmoJk99sa6VnXFQv6dGS74P3nFQu6Hdk+/76lpxaFo0p1kYxBkkNL1yxofI65tR9BqLhqQUXbrU36GFSo3dqopFxztlublEGaqxregpzNCwsOqB1VWhwTmzgto7JHUemo0iqo7FFUOaq0Eip7FL93Dwo7LjnvUaUVUdqjmPWo0qpU3qNoH+09iuJ2a6M9m5ceVVqdups4F0CkoGkKwbnYXMHTXnymQFy7tUl5zAccSvHNJ6sNur2+92TV0XrXnUOmGoshTZD7NVrRG4ehzSQVyVJJbCd/KO6GGNnvagiuyr4g91PG/sQ9nqwKrsq6oCbkcC44WRVclW1BrXAOFtiMrEhFQdkiacFVmRakDgXJm6EgcZE1C1ouFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCFBA0JCNwznsxp/HdRlzkBO+/QLjbB3j3qcu5mx6fUHnw+VqWpjw7vyJbrc7EJwq736B0XsyxGk/ZEs7Vy7YkL6gcVsoegfttPcKGlecvJWMb3E18w67MZ08VuUp90ipMQh9Ze3LPz5Bx7/gN44EdZvdsNwZ9oXdKCUIvIR2EeAdg7rnf/doIIO32LgePLoOXhouJAisNLpu7xU0LEuhVyHh4DtYGfty8CBURlAHxmi3ku0X9IS/dtdJj1vfF2FWEFqpHnq9X9CgxvcaQMjYYvUWa1EU1F7XLOc//vh5vEN1QM8wOki3YWddeHvQuPPG+7WPH9xbpDP5mPcPC3f8kbQbpcBrtYFjkLlA8Xr/wCsCU40Oz1caVOTavVpbU42FQ0EACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgLYFNS9ZTrfWo5JQVbkOCgIYFGQ21T/8ssdnbr92+1tnY6laYN27GfGoqChBw1ny26HTfrPH8OOObeRM3Q3Vj6MC9r101/X32TKcvJ+DMYFvfW3v8Zdc96NrhosSBDcCqvCggTlOQozluUIqvTsNypo91XQ+DpCU7ofmRTUN1Mc9FnQEAeVfogZFWQICgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgI8B/WAj0wkbOZegAAAABJRU5ErkJggg==" /><!-- --></p>
 <p>where we can see that the diagonal of this covariance matrix is
 non-constant.</p>
 <p>We therefore derive an alternative specification that preserves a
@@ -631,11 +729,11 @@ first-order autoregressive example</p>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>)</span>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
 <span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>Sigma2 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_kk))</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>Sigma2 <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">as.matrix</span>(out<span class="sc">$</span>obj<span class="sc">$</span><span class="fu">report</span>()<span class="sc">$</span>Q_oo))</span>
 <span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">plot</span>( <span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">y =</span> <span class="fu">diag</span>(Sigma2), <span class="at">xlab=</span><span class="st">&quot;time&quot;</span>, </span>
 <span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>      <span class="at">ylab=</span><span class="st">&quot;Marginal variance&quot;</span>, <span class="at">type=</span><span class="st">&quot;l&quot;</span>, </span>
 <span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>      <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fu">max</span>(<span class="fu">diag</span>(Sigma1))))</span></code></pre></div>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAUVBMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6kNtmAABmADpmtrZmtv+QOgCQZgCQ2/+2ZgC2/7a2///bkDrb/7bb////tmb/25D//7b//9v////9m+XQAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAGw0lEQVR4nO2djXKjNhRGnThu7dZuaGiwzfs/aBEYx+4WHYEAydJ3ZrIzO6tF5Fjo5+oib2phZRP6BmJHggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAiQIkCBAggAJAh4EXQ6b7XexD3cvUfIjqHr7LLffl4MMPXEXdD3t60ZQXb5/hbyf6LgLuhyOraBKgp74pQUVzY/44b99ULk5BrybCHkexTabt0+/y70MEwTNwctMqyQImCLIdM/Vxm8alLKgbvi6HD5WqTc04wWZeZDBbx6UsCAzDzL4zaQTFlR3M6DzzqsTSllQ42bjPw/y+t8romEekCBggqDrqZuDq5MeKFjMEedIWNA8ocSkBXnEOcYvkkMzZaLotcYYW29oJvRB1RyhsoQFteEyjWLTCwa53HJIEDBBUP+M6REbKFhsv8uPZsXq1VUnLMhMFCuzs2rbF8PlSNKCjvX596/2Z4iyj1gPhq4TFmQiipc/Pm2C+qBjw1A7S1hQG2st9rZH7GE1MhS5TllQXXyYkcwyiGXeghy4b9zn2Ac50c+VBh/D3AWtfbnlGCmomQRpsepZ8Jmh7cWEBT0MUROqyyCi6BVyHV9vaKZEFLWrYS3o1EmXzb+3DS3DPsiF8u3zlkAkQf9H149fT5Z085QFcUSx78dNaC1DQRxRvM8Eio8MBblEFHstw4v+pAVxRPG+nL+e8hPkEFGcs97QLBJRnLPe0CwSUZyz3tAoHgRIEDBlFFN+kL1g4Z8lnbag2mxWNOhlFmvBwSngzPWGZuUWlEPItU3cUB80XFCjmGfBIJdbDgkCJAiQIECCAAkCRmd3/Ez1bDPpnLNcXcg6y9WBzHMU3TcO6zyzXEdsHGbZgpw2DnPOcnXaOMw5y1Ubh1RQG4dUcMzGYYbZHX7VPYdcHQ6hC0gIQUtdbjkmCNLhJlBQh5vYC+pwEyjokGnvEBRJWJDL4Sa87ZqwIKfDTdBiwoLc3hcjiwkLWrne0EgQIEHA6F0NvbPqWzDI5ZZDggCPYX7jc9hbwoJugfhmouOzKktYUD9JNt+tMT3qmrCghyPbPd5/TljQ/cj24fctLVd5jme+AD59kM+hpSkL6sYxs/fjMVVMWtCq9YZmeh+0Ur2hWSTkOme9oZnSSWtXw1pQq3nPgi1K4rSTdxIn5yjmnYLnkKOYdxKnQ45i3i3I7bjkjJM4nXIUc07iVI4iFtThJl4Fn1ES58jqUo8o9ksIrcWGCl4O3mcKjKs3NFOGeYdvMc58sVrQ45X3YtVQWvedXZYaL8M0QebbaL3eOHStZlKRWS4ytpE/FTddjN/3anjcVfyCzOlB9sA9L1Y97ip2QYXL0Uq4WPW4q7gFlZ5rMMdq/IoEFDTbTNrjrqIWtDgS5F+NBHkXSVnQ6yJBgAQBEgRIECBBgAQBEgRIECBBgAQBEgRIELCCoDYaxzHswh7HPe8wJlxSUP2W+1SNOZt+eUHXU3M3JQa8K3ug22QHwqny5hsYrSdDXA5ttLQy5ZwNLS+oSwuld9AuB6ugbsfJepHuLa5i2GHVhZO7S1nKPbNWH0QfWbn9yybo/Bt+4iSo2uzb7U63D+zOWoLgJbRGgLUPqt7/PlBHho9Ytx/cuXbeGl5JEOw0mmZvFdRuS9GrkNj5tla6tuzcCa0jqII+2uxk2wW98cduGul5Z/sgohVEO9Vtq7cLatXYXgNw6VtifcRKmgWVtz3L4V+/+32sXbVDy4i0ky7dzrqwtqAu88b6sXe/uLVIFeUwb+8WfrDPpE0vBa/VOvZB0U0Ub88P3hEsNSperxRU5Na8yriWGi+OBAESBEgQIEGABAESBEgQIEGABAESBEgQIEGABAESBEgQIEGABAESBEgQIEGABAESBEgQIEGABAESBMQpqDrOdL61P1EKikWOQYKAGAWZpPrtP+bo1N2fJrfV/L3NCnPK2J+ZGAW1Lag9W3bXJum/f7UZcyaR0zUbaz4iF7Sv+z9u38k0y8n7Y4hc0LG+/9FlzVkTXZfghQRhKuwivJCgeY7CHMvrCAo09kcqaP+roO51hGLtdhSloLro50GPgtp50NqDWKSCIkKCAAkCJAiQIECCAAkCJAiQIECCAAkCJAiQIECCAAkCJAiQIECCAAkCJAiQIECCAAkCJAj4F0WLPcJ7cyWpAAAAAElFTkSuQmCC" /><!-- --></p>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
 <p>This shows that the corrected (nonstationary) exogenous variance
 results in a stationary marginal variance for the AR1 process. This
 correction can be done in two different ways that are identical when the
@@ -647,8 +745,8 @@ values of Leontief matrix (which is itself a matrix inverse). It
 therefore is computationally expensive for large models containing
 complicated dependencies.</p>
 </div>
-<div id="reduced-rank-models" class="section level3">
-<h3>Reduced rank models</h3>
+<div id="reduced-rank-models" class="section level2">
+<h2>Reduced rank models</h2>
 <p>We note that some DSEM specifications will be reduced rank. This
 arises for example when specifying a dynamic factor analysis, where
 <span class="math inline">\(J\)</span> variables are explained by <span class="math inline">\(F &lt; J\)</span> factors that each follow a
@@ -679,7 +777,7 @@ random walk:</p>
 <span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
 <span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>    <span class="at">run_model =</span> <span class="cn">FALSE</span>, </span>
 <span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;projection&quot;</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;project&quot;</span></span>
 <span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>  )</span>
 <span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can extract the covariance and inspect the eigenvalues:</p>
@@ -701,7 +799,7 @@ random walk:</p>
 cannot evaluate the probability density of state matrix <span class="math inline">\(\mathbf X\)</span> using this precision matrix
 (i.e., the log-determinant is not defined).</p>
 <p>To address this circumstance, we can switch to using
-<code>gmrf_parameterization = &quot;projection&quot;</code>. This evaluates the
+<code>gmrf_parameterization = &quot;project&quot;</code>. This evaluates the
 probability density of a set of innovations <span class="math inline">\(\mathbf X^*\)</span> that follow a unit
 variance:</p>
 <p><span class="math display">\[
@@ -714,6 +812,43 @@ G_{\mathrm{joint}} \mathrm{vec}(\mathbf X)^*
 \]</span></p>
 <p>This parameterization allows us to fit DSEM using a rank-deficient
 structural model.</p>
+</div>
+</div>
+<div id="works-cited" class="section level1 unnumbered">
+<h1 class="unnumbered">Works cited</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bates_matrix_2023" class="csl-entry">
+Bates, Douglas, Martin Maechler, and Mikael Jagan. 2023. <em>Matrix:
+Sparse and Dense Matrix Classes and Methods</em>. <a href="https://CRAN.R-project.org/package=Matrix">https://CRAN.R-project.org/package=Matrix</a>.
+</div>
+<div id="ref-fox_structural_2006" class="csl-entry">
+Fox, John. 2006. <span>“Structural Equation Modeling with the Sem
+Package in <span>R</span>.”</span> <em>Structural Equation Modeling-a
+Multidisciplinary Journal</em> 13: 465–86.
+</div>
+<div id="ref-guennebaud_eigen_2010" class="csl-entry">
+<span class="nocase">Guennebaud, G., B. Jacob, et al.</span> 2010.
+<em>Eigen V3</em>. <a href="https://libeigen.gitlab.io/">https://libeigen.gitlab.io/</a>.
+</div>
+<div id="ref-kristensen_tmb:_2016" class="csl-entry">
+Kristensen, Kasper, Anders Nielsen, Casper W. Berg, Hans Skaug, and
+Bradley M. Bell. 2016. <span>“<span>TMB</span>: <span>Automatic</span>
+Differentiation and <span>Laplace</span> Approximation.”</span>
+<em>Journal of Statistical Software</em> 70 (5): 1–21. <a href="https://doi.org/10.18637/jss.v070.i05">https://doi.org/10.18637/jss.v070.i05</a>.
+</div>
+<div id="ref-skaug_automatic_2006" class="csl-entry">
+Skaug, Hans, and Dave Fournier. 2006. <span>“Automatic Approximation of
+the Marginal Likelihood in Non-<span>Gaussian</span> Hierarchical
+Models.”</span> <em>Computational Statistics &amp; Data Analysis</em> 51
+(2): 699–709.
+</div>
+<div id="ref-thorson_dynamic_2024" class="csl-entry">
+Thorson, James T., Alexander G. Andrews III, Timothy E. Essington, and
+Scott I. Large. 2024. <span>“Dynamic Structural Equation Models
+Synthesize Ecosystem Dynamics Constrained by Ecological
+Mechanisms.”</span> <em>Methods in Ecology and Evolution</em> 15 (4):
+744–55. <a href="https://doi.org/10.1111/2041-210X.14289">https://doi.org/10.1111/2041-210X.14289</a>.
+</div>
 </div>
 </div>
 

@@ -4,6 +4,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 set.seed(101)
+start_time = Sys.time()
 # Install locally
 #  devtools::install_local( R'(C:\Users\James.Thorson\Desktop\Git\dsem)', force=TRUE )
 # Build
@@ -27,9 +28,11 @@ data = data.frame(x=x, y=y)
 Lm = lm( y ~ x, data=data )
 
 # Fit as DSEM
-fit = dsem( sem = "x -> y, 0, beta",
-            tsdata = ts(data),
-            control = dsem_control(quiet=TRUE) )
+fit = dsem( 
+  sem = "x -> y, 0, beta",
+  tsdata = ts(data),
+  control = dsem_control(quiet=TRUE) 
+)
 
 # Display output
 m1 = rbind(
@@ -47,9 +50,9 @@ simResp = apply(samples, MARGIN=3, FUN=as.vector)[which_use,]
 
 # Build and display DHARMa object
 res = DHARMa::createDHARMa(
-        simulatedResponse = simResp,
-        observedResponse = unlist(data)[which_use],
-        fittedPredictedResponse = fitResp )
+  simulatedResponse = simResp,
+  observedResponse = unlist(data)[which_use],
+  fittedPredictedResponse = fitResp )
 plot(res)
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
@@ -61,6 +64,37 @@ res0 = resid(Lm,"working")
 plot( x=res0, y=qnorm(res[,2]),
       xlab="linear model residuals", ylab="dsem residuals" )
 abline(a=0,b=1)
+
+## -----------------------------------------------------------------------------
+# Simulate a log-linked Poisson GLM
+x = rnorm(100)
+p = 1 + 0.8 * x
+y = rpois( length(x), lambda = exp(p) )
+data = data.frame(x=x, y=y)
+
+# Fit as generalized linear model
+Glm = glm( y ~ x, data=data, family = poisson() )
+
+# Define zero process errors (only process errors) in response y
+sem = "
+  x -> y, 0, beta
+  y <-> y, 0, NA, 0
+"
+
+# Fit as DSEM
+fit = dsem( 
+  sem = sem,
+  tsdata = ts(data),
+  family = c("fixed","poisson"),
+  control = dsem_control(quiet=TRUE) 
+)
+
+# Display output
+m1 = rbind(
+  "glm" = summary(Glm)$coef[2,1:2],
+  "dsem" = summary(fit)[1,9:10]
+)
+knitr::kable( m1, digits=3)
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 data(KleinI, package="AER")
@@ -84,12 +118,15 @@ sem = "
 "
 tsdata = TS[,c("time","gnp","pwage","cprofits",'consumption',
                "gwage","invest","capital")]
-fit = dsem( sem=sem,
-            tsdata = tsdata,
-            estimate_delta0 = TRUE,
-            control = dsem_control(
-              quiet = TRUE,
-              newton_loops = 0) )
+fit = dsem( 
+  sem = sem,
+  tsdata = tsdata,
+  estimate_delta0 = TRUE,
+  control = dsem_control(
+    quiet = TRUE,
+    newton_loops = 0
+  ) 
+)
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 # Specify using equations
@@ -101,12 +138,15 @@ equations = "
 
 # Convert and run
 sem_equations = convert_equations(equations)
-fit = dsem( sem = sem_equations,
-            tsdata = tsdata,
-            estimate_delta0 = TRUE,
-            control = dsem_control(
-              quiet = TRUE,
-              newton_loops = 0) )
+fit = dsem( 
+  sem = sem_equations,
+  tsdata = tsdata,
+  estimate_delta0 = TRUE,
+  control = dsem_control(
+    quiet = TRUE,
+    newton_loops = 0
+  ) 
+)
 
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 # dynlm
@@ -189,23 +229,30 @@ sem = "
   moose -> moose, 1, arM
 "
 # initial first without delta0 (to improve starting values)
-fit0 = dsem( sem = sem,
-             tsdata = data,
-             estimate_delta0 = FALSE,
-             control = dsem_control(
-               quiet = FALSE,
-               getsd = FALSE) )
+fit0 = dsem( 
+  sem = sem,
+  tsdata = data,
+  estimate_delta0 = FALSE,
+  control = dsem_control(
+    quiet = FALSE,
+    getsd = FALSE
+  ) 
+)
 
 #
 parameters = fit0$obj$env$parList()
   parameters$delta0_j = rep( 0, ncol(data) )
 
 # Refit with delta0
-fit = dsem( sem = sem,
-            tsdata = data,
-            estimate_delta0 = TRUE,
-            control = dsem_control( quiet=TRUE,
-                                    parameters = parameters ) )
+fit = dsem( 
+  sem = sem,
+  tsdata = data,
+  estimate_delta0 = TRUE,
+  control = dsem_control( 
+    quiet=TRUE,
+    parameters = parameters 
+  ) 
+)
 
 # dynlm
 fm_wolf = dynlm( wolves ~ 1 + L(wolves) + L(moose), data=data )   #
@@ -306,10 +353,15 @@ sem = "
 "
 
 # Fit
-fit = dsem( sem = sem,
-            tsdata = Z,
-            family = family,
-            control = dsem_control(use_REML=FALSE, quiet=TRUE) )
+fit = dsem( 
+  sem = sem,
+  tsdata = Z,
+  family = family,
+  control = dsem_control(
+    use_REML=FALSE, 
+    quiet=TRUE
+  ) 
+)
 ParHat = fit$obj$env$parList()
 # summary( fit )
 
@@ -480,10 +532,14 @@ sem = "
 "
 
 # Fit model
-fit = dsem( sem = sem,
-            tsdata = Z,
-            control = dsem_control(use_REML=FALSE, quiet=TRUE) )
-# summary( fit )
+fit = dsem( 
+  sem = sem,
+  tsdata = Z,
+  control = dsem_control(
+    use_REML=FALSE, 
+    quiet=TRUE
+  ) 
+)
 
 #
 library(phylopath)
@@ -517,4 +573,7 @@ ggarrange(p1 + scale_x_continuous(expand = c(0.3, 0)),
                     p2 + scale_x_continuous(expand = c(0.3, 0)),
                     labels = c("Simultaneous effects", "Two-sided p-value"),
                     ncol = 1, nrow = 2)
+
+## ----include = FALSE, warning=FALSE, message=FALSE----------------------------
+run_time = Sys.time() - start_time
 

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="James Thorson" />
+
+
+<title>Random slopes</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Random slopes</h1>
+<h4 class="author">James Thorson</h4>
+
+
+
+<div id="random-slopes-models" class="section level2">
+<h2>Random slopes models</h2>
+<p><code>dsem</code> can be specified to estimate variation over time in
+a slope parameter that measures the impact of one variable on
+another.</p>
+<p>To show this, we predict sea surface temperature from Departure Bay
+based upon the Pacific Decadal Oscillation:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dsem)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">data</span>(pdo_departure_bay)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># Format</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>tsdata <span class="ot">=</span> <span class="fu">ts</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">Temp =</span> pdo_departure_bay[,<span class="dv">2</span>],</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">PDO =</span> pdo_departure_bay[,<span class="dv">3</span>],</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="at">slope =</span> <span class="cn">NA</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>), <span class="at">start =</span> <span class="dv">1914</span> )</span></code></pre></div>
+<p>We first fit these data using a stationary slope parameter:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Model</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>sem <span class="ot">=</span> <span class="st">&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="st">  PDO -&gt; Temp, 0, slope</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="st">  PDO -&gt; PDO, 1, ar_PDO</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="st">  Temp -&gt; Temp, 1, ar_Temp</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Fit</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>fit0 <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">tsdata =</span> tsdata[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>],</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="at">sem =</span> sem,</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="at">estimate_mu =</span> <span class="fu">colnames</span>(tsdata)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>],</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  <span class="at">estimate_delta0 =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    <span class="at">use_REML =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  )</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>)</span></code></pre></div>
+<p>We then re-fit while estimating the slope parameter as a model
+variable that follows a first-order autoregressive process:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Model</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>sem <span class="ot">=</span> <span class="st">&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="st">  PDO -&gt; Temp, 0, slope</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="st">  slope -&gt; slope, 1, ar_slope</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="st">  PDO -&gt; PDO, 1, ar_PDO</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="st">  Temp -&gt; Temp, 1, ar_Temp</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># Fit</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">tsdata =</span> tsdata,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">sem =</span> sem,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">estimate_mu =</span> <span class="fu">colnames</span>(tsdata),</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">estimate_delta0 =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>    <span class="at">use_REML =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;full&quot;</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  )</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>)</span></code></pre></div>
+<p>We then plot the predicted state-variables:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># get estimates and SEs for first model</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">expand.grid</span>( <span class="at">year =</span> <span class="fu">time</span>(tsdata), <span class="at">var =</span> <span class="fu">colnames</span>(tsdata))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>df<span class="sc">$</span>est <span class="ot">=</span> <span class="fu">as.vector</span>(<span class="fu">as.list</span>(fit<span class="sc">$</span>sdrep, <span class="at">what =</span> <span class="st">&quot;Estimate&quot;</span>, <span class="at">report =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>z_tj)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>df<span class="sc">$</span>se <span class="ot">=</span> <span class="fu">as.vector</span>(<span class="fu">as.list</span>(fit<span class="sc">$</span>sdrep, <span class="at">what =</span> <span class="st">&quot;Std. Error&quot;</span>, <span class="at">report =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>z_tj)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>df<span class="sc">$</span>obs <span class="ot">=</span> <span class="fu">as.vector</span>(tsdata)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># get estimates and SEs for second model</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>df0 <span class="ot">=</span> <span class="fu">expand.grid</span>( <span class="at">year =</span> <span class="fu">time</span>(tsdata), <span class="at">var =</span> <span class="st">&quot;constant_slope&quot;</span> )</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>df0<span class="sc">$</span>est <span class="ot">=</span>  <span class="fu">subset</span>( <span class="fu">summary</span>(fit0), path <span class="sc">==</span> <span class="st">&quot;PDO -&gt; Temp&quot;</span> )<span class="sc">$</span>Estimate</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>df0<span class="sc">$</span>se <span class="ot">=</span>  <span class="fu">subset</span>( <span class="fu">summary</span>(fit0), path <span class="sc">==</span> <span class="st">&quot;PDO -&gt; Temp&quot;</span> )<span class="sc">$</span>Std_Error</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>df0<span class="sc">$</span>obs <span class="ot">=</span> <span class="cn">NA</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co"># Combine</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">rbind</span>( df, df0 )</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>df<span class="sc">$</span>var <span class="ot">=</span> <span class="fu">factor</span>( df<span class="sc">$</span>var, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;PDO&quot;</span>,<span class="st">&quot;Temp&quot;</span>,<span class="st">&quot;slope&quot;</span>,<span class="st">&quot;constant_slope&quot;</span>) )</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">ggplot</span>(df) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="fu">geom_line</span>( <span class="fu">aes</span>( <span class="at">x=</span>year, <span class="at">y =</span> est) ) <span class="sc">+</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="fu">geom_point</span>( <span class="fu">aes</span>( <span class="at">x=</span>year, <span class="at">y =</span> obs) ) <span class="sc">+</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>( <span class="fu">aes</span>( <span class="at">x =</span> year, <span class="at">ymin =</span> est <span class="sc">-</span> <span class="fl">1.96</span><span class="sc">*</span>se, <span class="at">ymax =</span> est <span class="sc">+</span> <span class="fl">1.96</span><span class="sc">*</span>se), <span class="at">alpha =</span> <span class="fl">0.4</span> ) <span class="sc">+</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>  <span class="fu">facet_grid</span>( <span class="fu">vars</span>(var), <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">labeller =</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>              <span class="fu">labeller</span>(<span class="at">var =</span> <span class="fu">c</span>(<span class="at">PDO =</span> <span class="st">&quot;PDO&quot;</span>, <span class="at">Temp =</span> <span class="st">&quot;Temperature (C)&quot;</span>, <span class="at">slope =</span> <span class="st">&quot;slope (varying)&quot;</span>, <span class="at">constant_slope =</span> <span class="st">&quot;slope (constant)&quot;</span>)) ) <span class="sc">+</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Observation / Estimate&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>And can also visualize the estimated graph</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>g <span class="ot">=</span> <span class="fu">make_empty_graph</span>(<span class="dv">8</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>name <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;P[t]&quot;</span>, <span class="st">&quot;T[t]&quot;</span>, <span class="st">&quot;z[t]&quot;</span>, <span class="st">&quot;b[t]&quot;</span>, <span class="st">&quot;P[t+1]&quot;</span>, <span class="st">&quot;T[t+1]&quot;</span>, <span class="st">&quot;z[t+1]&quot;</span>, <span class="st">&quot;b[t+1]&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>shape <span class="ot">=</span> <span class="fu">c</span>( <span class="st">&quot;square&quot;</span>,<span class="st">&quot;square&quot;</span>,<span class="st">&quot;diamond&quot;</span>,<span class="st">&quot;circle&quot;</span>, <span class="st">&quot;square&quot;</span>,<span class="st">&quot;square&quot;</span>,<span class="st">&quot;diamond&quot;</span>,<span class="st">&quot;circle&quot;</span> )</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="fu">V</span>(g)<span class="sc">$</span>label <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;P[t]&quot;</span>, <span class="st">&quot;T[t]&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;beta[t]&quot;</span>, <span class="st">&quot;P[t+1]&quot;</span>, <span class="st">&quot;T[t+1]&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;beta[t+1]&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;P[t]&quot;</span>, <span class="st">&quot;T[t]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> <span class="st">&quot;&quot;</span>, <span class="at">type =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>))</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;P[t+1]&quot;</span>, <span class="st">&quot;T[t+1]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> <span class="st">&quot;&quot;</span>, <span class="at">type =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>))</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;b[t]&quot;</span>, <span class="st">&quot;z[t]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> <span class="st">&quot;&quot;</span>, <span class="at">type =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>))</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;b[t+1]&quot;</span>, <span class="st">&quot;z[t+1]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> <span class="st">&quot;&quot;</span>, <span class="at">type =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co"># ARs</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>val <span class="ot">=</span> <span class="fu">paste0</span>( <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;slope -&gt; slope&quot;</span>)<span class="sc">$</span>Estimate,<span class="dv">2</span>), <span class="st">&quot; (&quot;</span>, <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;slope -&gt; slope&quot;</span>)<span class="sc">$</span>Std_Error,<span class="dv">2</span>),<span class="st">&quot;)&quot;</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;b[t]&quot;</span>, <span class="st">&quot;b[t+1]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> val, <span class="at">type =</span> <span class="st">&quot;dotted&quot;</span>, <span class="at">col =</span> <span class="st">&quot;grey&quot;</span>))</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>val <span class="ot">=</span> <span class="fu">paste0</span>( <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;PDO -&gt; PDO&quot;</span>)<span class="sc">$</span>Estimate,<span class="dv">2</span>), <span class="st">&quot; (&quot;</span>, <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;PDO -&gt; PDO&quot;</span>)<span class="sc">$</span>Std_Error,<span class="dv">2</span>),<span class="st">&quot;)&quot;</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;P[t]&quot;</span>, <span class="st">&quot;P[t+1]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> val, <span class="at">type =</span> <span class="st">&quot;dotted&quot;</span>, <span class="at">col =</span> <span class="st">&quot;grey&quot;</span>))</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>val <span class="ot">=</span> <span class="fu">paste0</span>( <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;Temp -&gt; Temp&quot;</span>)<span class="sc">$</span>Estimate,<span class="dv">2</span>), <span class="st">&quot; (&quot;</span>, <span class="fu">round</span>(<span class="fu">subset</span>(<span class="fu">summary</span>(fit),path <span class="sc">==</span> <span class="st">&quot;Temp -&gt; Temp&quot;</span>)<span class="sc">$</span>Std_Error,<span class="dv">2</span>),<span class="st">&quot;)&quot;</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">c</span>(<span class="st">&quot;T[t]&quot;</span>, <span class="st">&quot;T[t+1]&quot;</span>), <span class="at">attr =</span> <span class="fu">list</span>(<span class="at">label =</span> val, <span class="at">type =</span> <span class="st">&quot;dotted&quot;</span>, <span class="at">col =</span> <span class="st">&quot;grey&quot;</span>))</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>loc_nodes <span class="ot">=</span> <span class="fu">rbind</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="dv">3</span>),</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">0</span>),</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">2</span>),</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">3</span>),</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">0</span>),</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">1</span>),</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">2</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>)</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>layout <span class="ot">=</span> <span class="fu">create_layout</span>( g, loc_nodes[,<span class="fu">c</span>(<span class="st">&quot;x&quot;</span>,<span class="st">&quot;y&quot;</span>)] )</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="fu">ggraph</span>(layout) <span class="sc">+</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>  <span class="fu">geom_edge_link2</span>(</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>    <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">length =</span> <span class="fu">unit</span>(<span class="dv">2</span>, <span class="st">&quot;mm&quot;</span>)),</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>    <span class="at">end_cap =</span> ggraph<span class="sc">::</span><span class="fu">circle</span>(<span class="dv">7</span>, <span class="st">&#39;mm&#39;</span>),</span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>    <span class="at">start_cap =</span> ggraph<span class="sc">::</span><span class="fu">circle</span>(<span class="dv">0</span>, <span class="st">&#39;mm&#39;</span>),</span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>    <span class="fu">aes</span>( <span class="at">label =</span> label, <span class="at">linetype =</span> type, <span class="at">col =</span> col ),  <span class="co"># , edge_width = ifelse(type == &quot;dotted&quot;, 0.8, 0.8)</span></span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>    <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="fl">0.4</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a>    <span class="at">label_parse =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">shape =</span> shape, <span class="at">size =</span> <span class="fu">ifelse</span>(shape <span class="sc">==</span> <span class="st">&quot;diamond&quot;</span>,<span class="dv">8</span>,<span class="dv">15</span>) ),</span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a>    <span class="co">#size = 15,</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a>    <span class="at">stroke =</span> <span class="fl">1.2</span>,</span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;white&quot;</span></span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a>  <span class="fu">geom_node_label</span>(</span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a>    <span class="at">lwd =</span> <span class="dv">0</span>,</span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> label),</span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a>    <span class="at">parse =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">color =</span> <span class="cn">NA</span>)) <span class="sc">+</span></span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>( <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">4.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">3.5</span>) )  <span class="sc">+</span></span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;circle&quot;</span> <span class="ot">=</span> <span class="dv">21</span>, <span class="st">&quot;square&quot;</span> <span class="ot">=</span> <span class="dv">22</span>, <span class="st">&quot;diamond&quot;</span> <span class="ot">=</span> <span class="dv">23</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span>  <span class="co"># ?scale_shape</span></span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a>  <span class="fu">scale_edge_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;solid&quot;</span> <span class="ot">=</span> <span class="st">&quot;solid&quot;</span>, <span class="st">&quot;dotted&quot;</span> <span class="ot">=</span> <span class="st">&quot;solid&quot;</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a>  <span class="fu">scale_edge_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span> <span class="ot">=</span> <span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey&quot;</span> <span class="ot">=</span> <span class="st">&quot;black&quot;</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb5-62"><a href="#cb5-62" tabindex="-1"></a>  <span class="fu">scale_size</span>( <span class="at">range =</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">15</span>), <span class="at">guide =</span> <span class="st">&quot;none&quot;</span> )</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>Runtime for this vignette: 1.95 secs</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

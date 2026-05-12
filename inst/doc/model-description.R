@@ -44,7 +44,7 @@ out = dsem(
 )
 
 # Extract covariance
-Sigma1 = solve(as.matrix(out$obj$report()$Q_kk))
+Sigma1 = solve(as.matrix(out$obj$report()$Q_oo))
 plot( x=1:10, y = diag(Sigma1), xlab="time", 
       ylab="Marginal variance", type="l", 
       ylim = c(0,max(diag(Sigma1))))
@@ -62,7 +62,7 @@ out = dsem(
 )
 
 # Extract covariance
-Sigma2 = solve(as.matrix(out$obj$report()$Q_kk))
+Sigma2 = solve(as.matrix(out$obj$report()$Q_oo))
 plot( x=1:10, y = diag(Sigma2), xlab="time", 
       ylab="Marginal variance", type="l", 
       ylim = c(0,max(diag(Sigma1))))
@@ -94,7 +94,7 @@ out = dsem(
   control = dsem_control(
     run_model = FALSE, 
     quiet = TRUE,
-    gmrf_parameterization = "projection"
+    gmrf_parameterization = "project"
   )
 )
 
