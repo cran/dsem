@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="James Thorson" />
+
+
+<title>MGARCH</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MGARCH</h1>
+<h4 class="author">James Thorson</h4>
+
+
+
+<div id="multivariate-generalized-autoregressive-conditional-heteroskedasticity-mgarch-models" class="section level2">
+<h2>Multivariate Generalized Autoregressive Conditional
+Heteroskedasticity (MGARCH) models</h2>
+<p><code>dsem</code> can be specified to estimate variation over time in
+a parameter representing the magnitude of exogenous variance (i.e.,
+two-headed arrow). This essentially allows <code>dsem</code> to function
+as a Multivariate Generalized Autoregressive Conditional
+Heteroskedasticity (MGARCH) model, while allowing missing values for
+covariates that drive changes in variance.</p>
+<p>To show this, we simulate three time-series of <span class="math inline">\(T=100\)</span> length, with no correlation but a
+steady increase in the standard deviation over time:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dsem)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># Specify settings</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>n_times <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>n_vars <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># SD over time</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>sigF_t <span class="ot">=</span> <span class="fu">seq</span>( <span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="at">length =</span> n_times )</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co"># Simulate and apply time-varying SD</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>eps_tc <span class="ot">=</span> <span class="fu">matrix</span>( <span class="fu">rnorm</span>(n_times<span class="sc">*</span>n_vars), <span class="at">ncol =</span> n_vars )</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>eps_tc <span class="ot">=</span> <span class="fu">sweep</span>( eps_tc, <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="at">FUN =</span> <span class="st">&quot;*&quot;</span>, <span class="at">STAT =</span> sigF_t )</span></code></pre></div>
+</div>
+<div id="exploratory-mgarch" class="section level2">
+<h2>Exploratory MGARCH</h2>
+<p>We first fit this without any covariate. To do so, we specify a
+latent variable <code>F</code> that follows a random walk with unit
+variance. This variable the moderates the double-headed arrows
+(representing the magnitude of exogenous variance) for each
+time-series:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Define data including latent factor for heteroskedasticity</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">setNames</span>( <span class="fu">data.frame</span>(eps_tc),letters[<span class="fu">seq_len</span>(n_vars)]),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">F =</span> <span class="cn">NA</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Define SEM using F as latent moderating variable</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>sem <span class="ot">=</span> <span class="st">&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="st">  a &lt;-&gt; a, 0, F</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="st">  b &lt;-&gt; b, 0, F</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="st">  c &lt;-&gt; c, 0, F</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="st">  F &lt;-&gt; F, 0, sdF, 0.1</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="st">  F -&gt; F, 1, NA, 1</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># exploratory fit</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>fit1 <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(dat),</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  <span class="at">sem =</span> sem,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  <span class="at">estimate_mu =</span> <span class="fu">colnames</span>(dat),</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>    <span class="at">use_REML =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;full&quot;</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>    <span class="at">logscale_moderating_variance =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  )</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>)</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co"># Inspect estimates</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="fu">summary</span>(fit1)</span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt;      path lag name start parameter first second direction   Estimate Std_Error</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt; 1 a &lt;-&gt; a   0    F    NA         0     a      a         4         NA        NA</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; 2 b &lt;-&gt; b   0    F    NA         0     b      b         4         NA        NA</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; 3 c &lt;-&gt; c   0    F    NA         0     c      c         4         NA        NA</span></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt; 4 F &lt;-&gt; F   0  sdF   0.1         1     F      F         2 0.07221498 0.0252122</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; 5  F -&gt; F   1 &lt;NA&gt;   1.0         0     F      F         1 1.00000000        NA</span></span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt;    z_value     p_value</span></span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; 1       NA          NA</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; 2       NA          NA</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt; 3       NA          NA</span></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; 4 2.864287 0.004179491</span></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt; 5       NA          NA</span></span></code></pre></div>
+<p>The model has a nonzero estimate of <code>sdF</code> representing the
+variance over time in heteroskedasticity (in log-space), suggesting that
+the model detects the heteroskedasticity.</p>
+</div>
+<div id="confirmatory-mgarch" class="section level2">
+<h2>Confirmatory MGARCH</h2>
+<p>Alternatively, we might specify a covariate that is hypothesized to
+drive heteroskedasticity. In this case, we simply specify a trend over
+time as covariate, and estimate its impact on the latent moderating
+variable. To avoid confounding between the random-walk for the latent
+variable and the trend covariate, we also remove the random-walk from
+the latent factor. Finally, we randomly simulate missing data in the
+covariate, to show that the MGARCH can still accomodate data that are
+missing at random:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Define data including latent factor for heteroskedasticity and covariate</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">setNames</span>( <span class="fu">data.frame</span>(eps_tc),letters[<span class="fu">seq_len</span>(n_vars)]),</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">F =</span> <span class="cn">NA</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">slope =</span> <span class="fu">scale</span>( <span class="fu">seq_len</span>(n_times), <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># Randomly simulate 10% missing data for covariate</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>dat<span class="sc">$</span>slope[ <span class="fu">sample</span>(<span class="fu">seq_len</span>(n_times), n_times<span class="sc">/</span><span class="dv">2</span>) ] <span class="ot">=</span> <span class="cn">NA</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># Define SEM using F as latent moderating variable</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># and slope as covariate for F</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>sem <span class="ot">=</span> <span class="st">&quot;</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="st">  a &lt;-&gt; a, 0, F</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="st">  b &lt;-&gt; b, 0, F</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="st">  c &lt;-&gt; c, 0, F</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="st">  F &lt;-&gt; F, 0, sdF, 0.1</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="st">  slope &lt;-&gt; slope, 0, sd_slope</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="st">  slope -&gt; slope, 1, NA, 1</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="st">  slope -&gt; F, 0, beta</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="st">&quot;</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co"># confirmatory MGARCH</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>fit2 <span class="ot">=</span> <span class="fu">dsem</span>(</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(dat),</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="at">sem =</span> sem,</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>  <span class="at">estimate_mu =</span> <span class="fu">colnames</span>(dat),</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>    <span class="at">use_REML =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;full&quot;</span>,</span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>    <span class="at">logscale_moderating_variance =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  )</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>)</span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co"># Inspect estimates</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="fu">summary</span>(fit2)</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt;              path lag     name start parameter first second direction</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; 1         a &lt;-&gt; a   0        F    NA         0     a      a         4</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; 2         b &lt;-&gt; b   0        F    NA         0     b      b         4</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; 3         c &lt;-&gt; c   0        F    NA         0     c      c         4</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; 4         F &lt;-&gt; F   0      sdF   0.1         1     F      F         2</span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; 5 slope &lt;-&gt; slope   0 sd_slope    NA         2 slope  slope         2</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; 6  slope -&gt; slope   1     &lt;NA&gt;   1.0         0 slope  slope         1</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; 7      slope -&gt; F   0     beta    NA         3 slope      F         1</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt;      Estimate   Std_Error     z_value      p_value</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; 1          NA          NA          NA           NA</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; 2          NA          NA          NA           NA</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; 3          NA          NA          NA           NA</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt; 4  0.10617048 0.112550326   0.9433156 3.455195e-01</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt; 5 -0.04800428 0.004794621 -10.0121119 1.348428e-23</span></span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt; 6  1.00000000          NA          NA           NA</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt; 7  0.32588875 0.046440238   7.0173790 2.260688e-12</span></span></code></pre></div>
+<p>The model has a positive estimate of <code>beta</code>, indicating
+that it attributes some portion of heteroskedasticity to the
+hypothesized covariate.</p>
+</div>
+<div id="comparison" class="section level2">
+<h2>Comparison</h2>
+<p>We can then plot these estimated variances against the true
+(simulated) value</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Bundle true and estimated time-series</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>Y <span class="ot">=</span> <span class="fu">cbind</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">True =</span> sigF_t,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">exp</span>(<span class="fu">predict</span>(fit1)[,<span class="dv">4</span>]),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="fu">exp</span>(<span class="fu">predict</span>(fit2)[,<span class="dv">4</span>])</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">matplot</span>( </span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">seq_len</span>(n_times), <span class="at">y =</span> Y, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lty =</span> <span class="st">&quot;solid&quot;</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>), <span class="at">xlab =</span> <span class="st">&quot;Time&quot;</span>, </span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;SD for heteroskedasticity&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">legend</span>( <span class="st">&quot;topleft&quot;</span>, <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;red&quot;</span>,<span class="st">&quot;blue&quot;</span>), <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>        <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;True&quot;</span>, <span class="st">&quot;Exploratory&quot;</span>, <span class="st">&quot;Confirmatory&quot;</span>))</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYAAAAGACAMAAACTGUWNAAAAgVBMVEUAAAAAADoAAGYAAP8AOpAAZrY6AAA6ADo6AGY6Ojo6OpA6kJA6kNtmAABmADpmZgBmZmZmkJBmtrZmtv+QOgCQOmaQZgCQkGaQkNuQtpCQ27aQ2/+2ZgC225C2/7a2///bkDrb2//b/9vb////AAD/tmb/trb/25D//7b//9v///8uOgeRAAAACXBIWXMAAA7DAAAOwwHHb6hkAAASQ0lEQVR4nO2dCXukuBGGNWbcs0nsSbLtnNM7JllIH///BwZdIEAI3SXR9T073nYbJKgXXaWSIA8UqAj0BTy7EACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwEACwIgMgKCEoAHGTq1cIAFgIAFgIAFgIAFgIAFiJANw/eB/r5TNKcgdWGgAteeMfevkhKLkDqVl+kQTA/WM0e/v19+DkjqQ8AG7vZ/mx36iEnhRAIwhMHLAEZFUmAEMbIIoAtgFzNcL2qQEMlRDvBW08/whg/AbHATklja80xYUA2PTPyqK0PaKoSZkB9IR8+WGXnNFBfv22lUptah5d14UCGJ7JjYZV0YWQt+sff1c7pBvJiV+fAAAzfBejBLSDlcwMLkPje2FPv2U31ALA7fs/yMtPCpRR3b+I0tQ0zP6sL9qN33pWQebbZxbiZrMciNkAeP8qShT90Q54r6eqCEwAuhhtQGtoGG/v1DL3/zyilgCaqATAc9iiW6RozcMf/Eb1R/gBGJrXYah1/9jq5rfSMtxQSiobZrYCcJ5+9Kx+u542WpgSRa0+Aphu0gMA7Rlyy28/gS3v/vRky0KhAMSxdQGQNX+j3KNPL2izb+mgKCWgKk0ASFgVdPvO7z2sAvYG8MZqns3ubbmSABY36A+gtQKwdZTLuE4BQJud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" /><!-- --></p>
+<p>As expected, using a covariate improves the estimated
+heteroskedasticity even in the presence of missing data.</p>
+<p>Runtime for this vignette: 2.79 secs</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

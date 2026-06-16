@@ -85,7 +85,7 @@ sem = "
 fit = dsem( 
   sem = sem,
   tsdata = ts(data),
-  family = c("fixed","poisson"),
+  family = list( x = fixed(), y = poisson("log") ),
   control = dsem_control(quiet=TRUE) 
 )
 
@@ -328,7 +328,7 @@ ggplot( effect) +
 ## ----echo=TRUE, message=FALSE, fig.width=7, fig.height=7----------------------
 data(bering_sea)
 Z = ts( bering_sea )
-family = rep('fixed', ncol(bering_sea))
+family = Map(function(.) fixed(), colnames(Z))
 
 # Specify model
 sem = "

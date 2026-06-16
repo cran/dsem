@@ -90,11 +90,10 @@ data = data.frame(
 out = dsem(
   tsdata = ts(data),
   sem = dsem,
-  family = c("normal","normal","fixed"),
+  family = list(x = gaussian(), y = gaussian(), F = fixed()),
   control = dsem_control(
     run_model = FALSE, 
-    quiet = TRUE,
-    gmrf_parameterization = "project"
+    quiet = TRUE
   )
 )
 

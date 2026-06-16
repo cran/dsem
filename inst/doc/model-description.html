@@ -602,12 +602,12 @@ with <span class="math inline">\(J=3\)</span> variables <span class="math inline
 <div id="measurement-errors" class="section level2">
 <h2>Measurement errors</h2>
 <p>DSEM includes multiple distribution for measurement errors. For
-example, if the user specifies <code>family[j] = &quot;fixed&quot;</code>
+example, if the user specifies <code>family[[j] = fixed()</code>
 then:</p>
 <p><span class="math display">\[
 y_{tj} = x_{tj} + d_{tj}
 \]</span> for all years. Alternatively, if the user specifies
-<code>family[j] = &quot;normal&quot;</code> then: <span class="math display">\[
+<code>family[[j]] = gaussian()</code> then: <span class="math display">\[
 y_{tj} \sim \mathrm{Normal}( x_{tj} + d_{tj}, {\sigma_j}^2)
 \]</span> and <span class="math inline">\({\sigma_j}^2\)</span> is then
 included as an estimated parameter. When estimating missing values or
@@ -773,13 +773,12 @@ random walk:</p>
 <span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>out <span class="ot">=</span> <span class="fu">dsem</span>(</span>
 <span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">tsdata =</span> <span class="fu">ts</span>(data),</span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="at">sem =</span> dsem,</span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>,<span class="st">&quot;normal&quot;</span>,<span class="st">&quot;fixed&quot;</span>),</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">gaussian</span>(), <span class="at">y =</span> <span class="fu">gaussian</span>(), <span class="at">F =</span> <span class="fu">fixed</span>()),</span>
 <span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">dsem_control</span>(</span>
 <span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>    <span class="at">run_model =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>    <span class="at">gmrf_parameterization =</span> <span class="st">&quot;project&quot;</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>  )</span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>    <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>  )</span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can extract the covariance and inspect the eigenvalues:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Extract covariance</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>

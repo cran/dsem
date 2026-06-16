@@ -1,8 +1,8 @@
 Package: dsem
 Type: Package
 Title: Dynamic Structural Equation Models
-Version: 2.0.1
-Date: 2026-05-12
+Version: 3.0.0
+Date: 2026-06-10
 Authors@R: 
     c(person(given = "James",
              family = "Thorson",
@@ -25,7 +25,7 @@ Authors@R:
 	     comment = c("creator of ggm, from which functions are copied to avoid dependency on package graph not on CRAN"))
     )
 Imports: TMB (>= 1.9.18), Matrix, igraph, utils, RTMB (>= 1.7.0),
-        ggraph, ggplot2, grid, methods, stats
+        ggraph, ggplot2, grid, methods, stats, checkmate
 Depends: R (>= 4.0.0),
 Suggests: knitr, AER, phylopath, rmarkdown, reshape, gridExtra, dynlm,
         MARSS, ggpubr, vars, testthat, DHARMa
@@ -44,7 +44,7 @@ URL: https://james-thorson-noaa.github.io/dsem/
 BugReports: https://github.com/James-Thorson-NOAA/dsem/issues/
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: yes
-Packaged: 2026-05-13 21:00:13 UTC; James.Thorson
+Packaged: 2026-06-10 18:23:05 UTC; James.Thorson
 Author: James Thorson [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-7415-1010>),
   Maurice Goodman [ctb] (ORCID: <https://orcid.org/0000-0002-6874-2313>),
@@ -55,4 +55,4 @@ Author: James Thorson [aut, cre] (ORCID:
     copied to avoid dependency on package graph not on CRAN)
 Maintainer: James Thorson <James.Thorson@noaa.gov>
 Repository: CRAN
-Date/Publication: 2026-05-14 14:20:24 UTC
+Date/Publication: 2026-06-16 08:30:02 UTC
